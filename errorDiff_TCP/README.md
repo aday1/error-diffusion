@@ -2,6 +2,7 @@
 
 - [ ] MaxMSP - develop and export binary <br>
 - [ ] maybe(?) port to [openFrameworks](https://openframeworks.cc/documentation/ofxNetwork/ofxTCPClient/) eventually
+https://forum.openframeworks.cc/t/sending-audio-stream-via-tcp-rawbytes/16901/5
 
 
 JACK AUDIO ROUTING SET UP DETAILS
