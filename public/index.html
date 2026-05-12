@@ -65,10 +65,10 @@
 
     .panel {
       border: 1px solid var(--line);
-      border-radius: 22px;
       background: var(--panel);
       backdrop-filter: blur(8px);
       box-shadow: 0 25px 80px rgba(0, 0, 0, 0.45);
+      clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px));
     }
 
     .hero {
@@ -136,7 +136,7 @@
       margin-right: 0.6rem;
       margin-top: 0.4rem;
       border: 1px solid var(--line);
-      border-radius: 999px;
+      border-radius: 0;
       padding: 0.35rem 0.7rem;
       font-family: Consolas, "Courier New", monospace;
       font-size: 0.82rem;
@@ -154,13 +154,14 @@
     .links a {
       text-decoration: none;
       border: 1px solid var(--line);
-      border-radius: 999px;
+      border-radius: 0;
       padding: 0.46rem 0.9rem;
       font-size: 0.78rem;
       text-transform: uppercase;
       letter-spacing: 0.1em;
       color: var(--fg);
       background: rgba(255,255,255,0.03);
+      clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
     }
 
     .lexicon {
@@ -172,12 +173,13 @@
 
     .chip {
       border: 1px solid var(--line);
-      border-radius: 999px;
+      border-radius: 0;
       padding: 0.3rem 0.62rem;
       font-family: Consolas, "Courier New", monospace;
       font-size: 0.75rem;
       color: var(--muted);
       background: rgba(255,255,255,0.03);
+      clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
     }
 
     .chip.catch { color: var(--jit-catch-signal); border-color: rgba(137, 245, 255, 0.35); }
@@ -193,10 +195,11 @@
 
     .card {
       border: 1px solid var(--line);
-      border-radius: 16px;
       background: rgba(255,255,255,0.03);
       padding: 0.9rem;
       overflow: hidden;
+      clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+      transform: skewY(-0.5deg);
     }
 
     .card h2 {
@@ -209,11 +212,11 @@
 
     .shot {
       position: relative;
-      border-radius: 12px;
       overflow: hidden;
       border: 1px solid rgba(255,255,255,0.14);
       background: #080808;
       min-height: 180px;
+      clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
     }
 
     .shot img {
@@ -267,18 +270,28 @@
     .ticker {
       margin-top: 1.2rem;
       border: 1px solid var(--line);
-      border-radius: 14px;
       overflow: hidden;
       background: rgba(255,255,255,0.03);
       font-family: Consolas, "Courier New", monospace;
       font-size: 0.82rem;
       color: var(--muted);
+      clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
     }
 
     .ticker-line {
       white-space: nowrap;
       padding: 0.6rem 0;
       animation: marquee 28s linear infinite;
+    }
+
+    .card:nth-child(2) { transform: skewY(0.5deg) translateY(4px); }
+    .card:nth-child(3) { transform: skewY(-0.8deg) translateY(-2px); }
+
+    .glitch::selection,
+    .summary::selection,
+    .chip::selection {
+      background: #fff;
+      color: #000;
     }
 
     @keyframes rgb-jitter {
