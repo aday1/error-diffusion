@@ -15,6 +15,9 @@
       --cyan: #89f5ff;
       --magenta: #ff4ac7;
       --lime: #b9ff7a;
+      --jit-catch-signal: #89f5ff;
+      --jit-release-signal: #ff4ac7;
+      --metro-clock-signal: #b9ff7a;
     }
 
     * { box-sizing: border-box; }
@@ -159,6 +162,27 @@
       color: var(--fg);
       background: rgba(255,255,255,0.03);
     }
+
+    .lexicon {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin-top: 0.5rem;
+    }
+
+    .chip {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 0.3rem 0.62rem;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.75rem;
+      color: var(--muted);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .chip.catch { color: var(--jit-catch-signal); border-color: rgba(137, 245, 255, 0.35); }
+    .chip.release { color: var(--jit-release-signal); border-color: rgba(255, 74, 199, 0.35); }
+    .chip.metro { color: var(--metro-clock-signal); border-color: rgba(185, 255, 122, 0.35); }
 
     .grid {
       margin-top: 1.2rem;
@@ -315,6 +339,18 @@
         <a href="https://github.com/aday1/error-diffusion">GitHub source</a>
         <a href="https://aday1.github.io/error-diffusion/">GitHub Pages backup</a>
       </div>
+      <div class="lexicon" aria-label="Max patch lexicon">
+        <span class="chip catch">jit.catch~</span>
+        <span class="chip catch">jit.net.recv</span>
+        <span class="chip metro">metro 4n @active 1</span>
+        <span class="chip">route connected latency</span>
+        <span class="chip">threshold 0.125</span>
+        <span class="chip">attack_time 1.2</span>
+        <span class="chip">release_time 120.</span>
+        <span class="chip release">jit.release~</span>
+        <span class="chip">record-curtis 2</span>
+        <span class="chip">playmode $1</span>
+      </div>
     </section>
 
     <section class="grid">
@@ -343,8 +379,9 @@
 
     <section class="ticker">
       <div class="ticker-line">
-        error-diffusion :: max patch loops :: tcp 7474 :: glitch routing :: record-curtis :: granular playback :: shader drift :: live residue ::
-        error-diffusion :: max patch loops :: tcp 7474 :: glitch routing :: record-curtis :: granular playback :: shader drift :: live residue ::
+        error-diffusion :: jit.catch~ :: jit.net.recv :: tcp 7474 :: route connected latency :: threshold 0.125 :: attack_time 1.2 :: release_time 120. ::
+        jit.release~ :: record-curtis 2 :: buffer~ curtis @size 60000 2 :: metro 4n @active 1 :: transport @tempo 90 :: playmode $1 :: freq 220. ::
+        error-diffusion :: jit.catch~ :: jit.net.recv :: tcp 7474 :: route connected latency :: threshold 0.125 :: attack_time 1.2 :: release_time 120. ::
       </div>
     </section>
   </main>
@@ -384,37 +421,37 @@
     }
   </script>
   <script>
-    var host = document.getElementById("shader");
-    var camera = new THREE.Camera();
-    var scene = new THREE.Scene();
-    var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    var uniforms = {
+    var jitHost = document.getElementById("shader");
+    var metroCamera = new THREE.Camera();
+    var signalScene = new THREE.Scene();
+    var jitRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    var patchUniforms = {
       time: { type: "f", value: 3.0 },
       resolution: { type: "v2", value: new THREE.Vector2() }
     };
 
-    camera.position.z = 2;
+    metroCamera.position.z = 2;
 
-    var geometry = new THREE.PlaneBufferGeometry(4, 2);
-    var material = new THREE.ShaderMaterial({
-      uniforms: uniforms,
+    var patchGeometry = new THREE.PlaneBufferGeometry(4, 2);
+    var patchMaterial = new THREE.ShaderMaterial({
+      uniforms: patchUniforms,
       vertexShader: document.getElementById("vertexShader").textContent,
       fragmentShader: document.getElementById("fragmentShader").textContent
     });
 
-    scene.add(new THREE.Mesh(geometry, material));
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    host.appendChild(renderer.domElement);
+    signalScene.add(new THREE.Mesh(patchGeometry, patchMaterial));
+    jitRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    jitHost.appendChild(jitRenderer.domElement);
 
     function resize() {
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      uniforms.resolution.value.x = renderer.domElement.width;
-      uniforms.resolution.value.y = renderer.domElement.height;
+      jitRenderer.setSize(window.innerWidth, window.innerHeight);
+      patchUniforms.resolution.value.x = jitRenderer.domElement.width;
+      patchUniforms.resolution.value.y = jitRenderer.domElement.height;
     }
 
     function frame() {
-      uniforms.time.value += 0.01;
-      renderer.render(scene, camera);
+      patchUniforms.time.value += 0.01;
+      jitRenderer.render(signalScene, metroCamera);
       requestAnimationFrame(frame);
     }
 
