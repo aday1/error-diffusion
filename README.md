@@ -30,12 +30,15 @@ Repository secret required:
 
 - `CLOUDFLARE_API_TOKEN`
 
-Cloudflare custom domains expected in `wrangler.toml`:
+Cloudflare custom domains expected on the Worker service:
 
 - `errordiffusion.cc`
 - `www.errordiffusion.cc`
 - `errordiffusion.net`
 - `www.errordiffusion.net`
+
+Note: route/domain attachment is managed in Cloudflare service settings.
+The GitHub Actions deploy updates Worker code/assets from this repository.
 
 Requested registrar nameservers:
 

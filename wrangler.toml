@@ -1,4 +1,4 @@
-name = "error-diffusion-site"
+name = "errordiffusion-cc"
 main = "src/index.js"
 compatibility_date = "2026-05-12"
 account_id = "98b823762cb6be14fb4fb00c935fadf1"
@@ -7,19 +7,3 @@ account_id = "98b823762cb6be14fb4fb00c935fadf1"
 directory = "./public"
 binding = "ASSETS"
 run_worker_first = true
-
-[[routes]]
-pattern = "errordiffusion.cc"
-custom_domain = true
-
-[[routes]]
-pattern = "www.errordiffusion.cc"
-custom_domain = true
-
-[[routes]]
-pattern = "errordiffusion.net"
-custom_domain = true
-
-[[routes]]
-pattern = "www.errordiffusion.net"
-custom_domain = true
