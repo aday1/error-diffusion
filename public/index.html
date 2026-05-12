@@ -8,10 +8,10 @@
   <style>
     :root {
       color-scheme: dark;
-      --fg: #f3f3f3;
-      --muted: #b9bcc7;
+      --fg: #f8fbff;
+      --muted: #d3d7e2;
       --line: rgba(255, 255, 255, 0.16);
-      --panel: rgba(10, 10, 10, 0.68);
+      --panel: rgba(5, 5, 5, 0.86);
       --cyan: #89f5ff;
       --magenta: #ff4ac7;
       --lime: #b9ff7a;
@@ -25,6 +25,7 @@
     body {
       font-family: "Audiowide", "Segoe UI", Tahoma, sans-serif;
       overflow-x: hidden;
+      text-shadow: 0 0 1px rgba(0, 0, 0, 0.7);
     }
 
     #shader {
@@ -55,12 +56,43 @@
       background-size: 100% 4px;
     }
 
+    .phosphor {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.1;
+      mix-blend-mode: overlay;
+      background:
+        repeating-linear-gradient(
+          90deg,
+          rgba(255, 0, 0, 0.15) 0 1px,
+          rgba(0, 255, 0, 0.15) 1px 2px,
+          rgba(0, 120, 255, 0.15) 2px 3px,
+          transparent 3px 6px
+        );
+      animation: phosphor-drift 9s linear infinite;
+    }
+
+    .vhs-warp {
+      position: fixed;
+      inset: -4%;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.14;
+      mix-blend-mode: screen;
+      background: radial-gradient(circle at 20% 10%, rgba(255, 0, 160, 0.34), transparent 45%),
+                  radial-gradient(circle at 80% 80%, rgba(0, 220, 255, 0.28), transparent 42%);
+      animation: warp-roll 8s ease-in-out infinite alternate;
+    }
+
     .page {
       position: relative;
       z-index: 2;
       width: min(1180px, calc(100vw - 2rem));
       margin: 0 auto;
       padding: 2rem 0 3rem;
+      isolation: isolate;
     }
 
     .panel {
@@ -69,6 +101,16 @@
       backdrop-filter: blur(8px);
       box-shadow: 0 25px 80px rgba(0, 0, 0, 0.45);
       clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px));
+      position: relative;
+    }
+
+    .panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.25));
+      mix-blend-mode: screen;
     }
 
     .hero {
@@ -97,6 +139,7 @@
       color: #fff;
       text-shadow: 3px 3px 0 #f00, -3px 3px 0 #0f0, 3px -3px 0 #00f;
       animation: rgb-jitter 530ms ease-in-out infinite alternate;
+      filter: contrast(1.15);
     }
 
     .glitch::before,
@@ -129,6 +172,8 @@
       color: var(--muted);
       font-family: Consolas, "Courier New", monospace;
       line-height: 1.7;
+      background: rgba(0, 0, 0, 0.35);
+      padding: 0.45rem 0.65rem;
     }
 
     .nameserver {
@@ -200,6 +245,21 @@
       overflow: hidden;
       clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
       transform: skewY(-0.5deg);
+      position: relative;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      left: -10%;
+      width: 120%;
+      top: 35%;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.2);
+      filter: blur(0.6px);
+      opacity: 0.45;
+      animation: line-tear 2200ms steps(2) infinite;
+      pointer-events: none;
     }
 
     .card h2 {
@@ -227,7 +287,7 @@
 
     .shot.glitch-a img {
       filter: saturate(1.2) contrast(1.08) hue-rotate(12deg);
-      animation: wobble 1300ms ease-in-out infinite alternate;
+      animation: wobble 1300ms ease-in-out infinite alternate, datamosh-a 1800ms steps(2) infinite;
     }
 
     .shot.glitch-b img {
@@ -256,7 +316,7 @@
 
     .shot.glitch-c img {
       filter: hue-rotate(210deg) contrast(1.1) brightness(0.95);
-      animation: rgb-jitter 800ms ease-in-out infinite alternate;
+      animation: rgb-jitter 800ms ease-in-out infinite alternate, datamosh-b 1600ms steps(2) infinite;
     }
 
     .card p {
@@ -329,12 +389,43 @@
       0% { transform: translate(0,0); }
       100% { transform: translate(1px,-1px); }
     }
+
+    @keyframes datamosh-a {
+      0%, 85%, 100% { transform: translate(0,0); }
+      86% { transform: translate(8px, -3px); }
+      92% { transform: translate(-12px, 2px); }
+    }
+
+    @keyframes datamosh-b {
+      0%, 88%, 100% { transform: translate(0,0); }
+      89% { transform: translate(-9px, 1px); }
+      94% { transform: translate(11px, -2px); }
+    }
+
+    @keyframes line-tear {
+      0%, 100% { top: 18%; opacity: 0.15; }
+      25% { top: 42%; opacity: 0.4; }
+      50% { top: 66%; opacity: 0.22; }
+      75% { top: 85%; opacity: 0.35; }
+    }
+
+    @keyframes phosphor-drift {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(12px); }
+    }
+
+    @keyframes warp-roll {
+      0% { transform: translate(-2%, -1%) rotate(-0.6deg) scale(1); }
+      100% { transform: translate(2%, 1%) rotate(0.6deg) scale(1.03); }
+    }
   </style>
 </head>
 <body>
   <div id="shader" aria-hidden="true"></div>
   <div class="noise" aria-hidden="true"></div>
   <div class="scan" aria-hidden="true"></div>
+  <div class="phosphor" aria-hidden="true"></div>
+  <div class="vhs-warp" aria-hidden="true"></div>
 
   <main class="page">
     <section class="panel hero">
@@ -414,6 +505,7 @@
 
     uniform float time;
     uniform vec2 resolution;
+    uniform vec2 mouse;
 
     void main(void) {
       vec2 fMosaicScal = vec2(1.4, 2.0);
@@ -431,6 +523,9 @@
         u += abs(cos(u * i * 0.1) * 0.1);
         o = max(o, abs(cos(3.0 * dot(u, u) + vec4(0.0))));
       }
+      float mouseWarp = sin((u.x + mouse.x * 1.5) * 18.0 + time * 2.5) * 0.06;
+      o.rg += mouseWarp;
+      o.b += sin((u.y + mouse.y) * 14.0 - time * 1.7) * 0.04;
       gl_FragColor = o;
     }
   </script>
@@ -441,7 +536,8 @@
     var jitRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     var patchUniforms = {
       time: { type: "f", value: 3.0 },
-      resolution: { type: "v2", value: new THREE.Vector2() }
+      resolution: { type: "v2", value: new THREE.Vector2() },
+      mouse: { type: "v2", value: new THREE.Vector2(0.5, 0.5) }
     };
 
     metroCamera.position.z = 2;
@@ -469,7 +565,13 @@
       requestAnimationFrame(frame);
     }
 
+    function updateMouse(e) {
+      patchUniforms.mouse.value.x = e.clientX / window.innerWidth;
+      patchUniforms.mouse.value.y = 1.0 - (e.clientY / window.innerHeight);
+    }
+
     window.addEventListener("resize", resize, false);
+    window.addEventListener("pointermove", updateMouse, false);
     resize();
     frame();
   </script>
