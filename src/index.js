@@ -13,6 +13,20 @@ export default {
       return Response.redirect(url.toString(), 301);
     }
 
-    return env.ASSETS.fetch(request);
+    const assetResponse = await env.ASSETS.fetch(request);
+    if (assetResponse.status !== 404) {
+      return assetResponse;
+    }
+
+    const crashPageRequest = new Request(new URL("/404.html", url).toString(), request);
+    const crashPageResponse = await env.ASSETS.fetch(crashPageRequest);
+    if (crashPageResponse.ok) {
+      return new Response(crashPageResponse.body, {
+        status: 404,
+        headers: crashPageResponse.headers
+      });
+    }
+
+    return assetResponse;
   }
 };
