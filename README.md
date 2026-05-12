@@ -1,22 +1,43 @@
-# -WIP
+# error-diffusion
 
-https://breakcore.com.au/viewtopic.php?f=8&t=179
+This repository now contains both:
 
-FILE: ShaderRips - REFERENCE FOR IDEAS
-PLEASE ADD ANY SHADERS YOU LIKE :)
+- legacy performance/project files
+- the website source of truth for error-diffusion domains
 
-IDEAS - 
+## Website source of truth
 
-UE4 = 
-Modular Warp Gates 
-Audio Mic in to Light Stuff in levels
-Modular Enviroments
-SciFi Reactor Hanger (To AVisualiser and Camera tracker)
+- Web source: `public/index.html`
+- Worker router: `src/index.js`
+- Cloudflare config: `wrangler.toml`
 
-- Fork of GLSLVEEJAY by maschere/glsl-vjay 
- -- Added spout
- -- Debug removed VU meters (gets about 120fps now via spout)
- -- Adding shaders for Error-diffusion gig
- https://github.com/aday1/glsl-vjay/tree/error-diffusion
+The visual/theme is based on:
+https://codepen.io/aday_net_au/pen/zYqdeEG
 
-𝖊𝖗𝖗𝖔𝖗 𝖉𝖎𝖋𝖋𝖚𝖘𝖎𝖔𝖓
+## Deployment model
+
+Push to `master` (or `main`) triggers:
+
+- Cloudflare deploy via `.github/workflows/deploy.yml`
+- GitHub Pages backup via `.github/workflows/pages-backup.yml`
+
+GitHub Pages backup URL:
+https://aday1.github.io/error-diffusion/
+
+## Cloudflare requirements
+
+Repository secret required:
+
+- `CLOUDFLARE_API_TOKEN`
+
+Cloudflare custom domains expected in `wrangler.toml`:
+
+- `errordiffusion.cc`
+- `www.errordiffusion.cc`
+- `errordiffusion.net`
+- `www.errordiffusion.net`
+
+Requested registrar nameservers:
+
+- `darl.ns.cloudflare.com`
+- `elisabeth.ns.cloudflare.com`
