@@ -4,82 +4,522 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>𝖊𝖗𝖗𝖔𝖗 𝖉𝖎𝖋𝖋𝖚𝖘𝖎𝖔𝖓</title>
+  <meta name="description" content="Error Diffusion archive: max packs, samples, gig posters, news, and live-performance scraps.">
   <style>
     :root {
       color-scheme: dark;
+      --bg: rgba(4, 4, 4, 0.76);
+      --panel: rgba(10, 10, 10, 0.7);
+      --line: rgba(255, 255, 255, 0.16);
+      --text: rgba(244, 244, 244, 0.92);
+      --muted: rgba(210, 210, 210, 0.72);
+      --cyan: #8cf3ff;
+      --green: #9fff8b;
+      --red: #ff5b6b;
+      --yellow: #ffe680;
+      --max-width: 1180px;
     }
+
     * {
       box-sizing: border-box;
     }
-    html, body {
-      margin: 0;
-      height: 100%;
-      background: #000;
-      color: #eaeaea;
-      font-family: "Audiowide", "Segoe UI", Tahoma, sans-serif;
-      overflow: hidden;
+
+    html {
+      scroll-behavior: smooth;
     }
+
+    body {
+      margin: 0;
+      min-height: 100%;
+      background: #000;
+      color: var(--text);
+      font-family: "Audiowide", "Segoe UI", Tahoma, sans-serif;
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+    }
+
     #container {
       position: fixed;
       inset: 0;
       z-index: 0;
     }
-    .overlay {
+
+    .scanlines {
       position: fixed;
       inset: 0;
       z-index: 1;
-      display: grid;
-      place-items: center;
       pointer-events: none;
-      text-align: center;
-      padding: 1rem;
+      background-image: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.04),
+        rgba(255, 255, 255, 0.01) 1px,
+        transparent 1px,
+        transparent 4px
+      );
+      background-size: 100% 4px;
+      mix-blend-mode: screen;
+      opacity: 0.2;
     }
+
+    .page {
+      position: relative;
+      z-index: 2;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      backdrop-filter: blur(8px);
+      background: rgba(0, 0, 0, 0.58);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .topbar-inner,
+    .section,
+    .hero {
+      width: min(var(--max-width), calc(100vw - 2rem));
+      margin: 0 auto;
+    }
+
+    .topbar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.85rem 0;
+    }
+
+    .wordmark {
+      margin: 0;
+      font-size: 0.9rem;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: flex-end;
+    }
+
+    .nav a,
+    .action {
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 999px;
+      padding: 0.45rem 0.85rem;
+      text-decoration: none;
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: border-color 180ms ease, transform 180ms ease, background 180ms ease;
+    }
+
+    .nav a:hover,
+    .action:hover,
+    .nav a:focus-visible,
+    .action:focus-visible {
+      border-color: var(--cyan);
+      background: rgba(140, 243, 255, 0.12);
+      transform: translateY(-1px);
+    }
+
+    .hero {
+      min-height: 100svh;
+      display: grid;
+      align-items: center;
+      padding: 5.5rem 0 3rem;
+    }
+
+    .hero-panel,
+    .section-panel,
+    .poster,
+    .scrap-card {
+      background: linear-gradient(180deg, rgba(14, 14, 14, 0.82), rgba(6, 6, 6, 0.72));
+      border: 1px solid var(--line);
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.34);
+      backdrop-filter: blur(7px);
+    }
+
+    .hero-panel {
+      padding: clamp(1.5rem, 4vw, 3rem);
+      border-radius: 28px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hero-panel::before {
+      content: "";
+      position: absolute;
+      inset: auto -12% -18% auto;
+      width: 22rem;
+      height: 22rem;
+      background: radial-gradient(circle, rgba(255, 91, 107, 0.22), transparent 60%);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      margin-bottom: 1rem;
+      color: var(--yellow);
+      font-size: 0.72rem;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+    }
+
     .title {
       margin: 0;
-      line-height: 1;
-      font-size: clamp(2.25rem, 10vw, 7.5rem);
+      line-height: 0.95;
+      font-size: clamp(3rem, 10vw, 7.8rem);
       letter-spacing: 0.08em;
-      color: rgba(255, 255, 255, 0.9);
-      text-shadow: 3px 3px 0 #f00, -3px 3px 0 #0f0, 3px -3px 0 #00f;
-      animation: rgb-glitch 550ms ease-in-out infinite alternate;
+      color: rgba(255, 255, 255, 0.94);
+      text-shadow: 4px 4px 0 #f00, -4px 4px 0 #0f0, 4px -4px 0 #00f;
       text-transform: lowercase;
+      animation: rgb-glitch 550ms ease-in-out infinite alternate;
     }
-    .dns {
-      position: fixed;
-      left: 50%;
-      bottom: 1rem;
-      transform: translateX(-50%);
-      z-index: 2;
-      width: min(980px, calc(100vw - 2rem));
-      background: rgba(0, 0, 0, 0.66);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 10px;
-      padding: 0.8rem 1rem;
+
+    .hero-copy {
+      max-width: 48rem;
+      margin: 1.5rem 0 0;
+      color: var(--muted);
       font-family: Consolas, "Courier New", monospace;
-      color: #f5f5f5;
-      backdrop-filter: blur(3px);
+      font-size: 1rem;
+      line-height: 1.7;
     }
-    .dns p {
-      margin: 0 0 0.45rem 0;
-      font-size: 0.93rem;
+
+    .hero-actions,
+    .meta-grid,
+    .card-grid,
+    .detail-grid,
+    .poster-grid,
+    .scrap-grid,
+    .footer-links {
+      display: grid;
+      gap: 1rem;
     }
-    .dns ul {
+
+    .hero-actions {
+      grid-template-columns: repeat(auto-fit, minmax(180px, max-content));
+      margin-top: 1.5rem;
+    }
+
+    .meta-grid {
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      margin-top: 2rem;
+    }
+
+    .meta-card,
+    .card,
+    .news-item,
+    .scrap-card {
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 1rem;
+    }
+
+    .meta-card strong,
+    .section-label,
+    .card .tag,
+    .news-date,
+    .detail-card .tag {
+      display: inline-block;
+      margin-bottom: 0.5rem;
+      font-size: 0.72rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--cyan);
+    }
+
+    .meta-card p,
+    .card p,
+    .news-item p,
+    .section-intro,
+    .detail-card p,
+    .scrap-card p,
+    .footer-note {
       margin: 0;
-      padding-left: 1.25rem;
-      font-size: 0.93rem;
-      line-height: 1.35;
+      color: var(--muted);
+      font-family: Consolas, "Courier New", monospace;
+      line-height: 1.6;
     }
-    .dns code {
-      color: #9ff;
+
+    .section {
+      padding: 0 0 2rem;
+      scroll-margin-top: 5rem;
     }
-    .links {
-      margin-top: 0.45rem;
-      font-size: 0.85rem;
+
+    .section-panel {
+      border-radius: 24px;
+      padding: clamp(1.25rem, 3vw, 2rem);
     }
-    .links a {
-      color: #9ff;
+
+    .section-header {
+      display: grid;
+      gap: 0.8rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: clamp(1.6rem, 4vw, 2.8rem);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .card-grid {
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+
+    .detail-grid {
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      margin-top: 1rem;
+    }
+
+    .patch-preview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .card {
+      display: grid;
+      gap: 1rem;
+      align-content: start;
+    }
+
+    .card h3,
+    .news-item h3,
+    .detail-card h3,
+    .scrap-card h3 {
+      margin: 0;
+      font-size: 1.05rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .detail-card {
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 1rem;
+      display: grid;
+      gap: 0.8rem;
+      align-content: start;
+    }
+
+    .detail-card ul,
+    .signal-list {
+      margin: 0;
+      padding-left: 1rem;
+      color: var(--muted);
+      font-family: Consolas, "Courier New", monospace;
+      line-height: 1.6;
+      font-size: 0.92rem;
+    }
+
+    .signal-list {
+      list-style: none;
+      padding-left: 0;
+      display: grid;
+      gap: 0.5rem;
+    }
+
+    .signal-list li {
+      padding: 0.7rem 0.8rem;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.025);
+    }
+
+    .signal-list strong {
+      color: var(--green);
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .link-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+    }
+
+    .link-row a,
+    .poster-meta a {
+      color: var(--cyan);
+      text-decoration: none;
+      font-size: 0.86rem;
+      font-family: Consolas, "Courier New", monospace;
+    }
+
+    .news-list {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .poster-grid {
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+
+    .poster {
+      border-radius: 22px;
+      overflow: hidden;
+    }
+
+    .poster img,
+    .scrap-card img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .poster-meta {
+      display: grid;
+      gap: 0.6rem;
+      padding: 1rem;
+    }
+
+    .poster-meta p {
+      margin: 0;
+      color: var(--muted);
+      font-family: Consolas, "Courier New", monospace;
+      line-height: 1.6;
+    }
+
+    .scrap-grid {
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+
+    .patch-preview {
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.035);
+      padding: 1rem;
+    }
+
+    .patch-window {
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: #1b1b1b;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+    }
+
+    .patch-bar {
+      display: flex;
+      gap: 0.35rem;
+      align-items: center;
+      padding: 0.55rem 0.7rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      background: #262626;
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .patch-bar::before,
+    .patch-bar::after {
+      content: "";
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.16);
+    }
+
+    .patch-canvas {
+      display: grid;
+      gap: 0.55rem;
+      padding: 0.9rem;
+      background-image: radial-gradient(rgba(255, 255, 255, 0.11) 0.7px, transparent 0.7px);
+      background-size: 12px 12px;
+    }
+
+    .patch-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+    }
+
+    .patch-box {
+      min-width: 4.4rem;
+      padding: 0.32rem 0.45rem;
+      border-radius: 4px;
+      background: #2e2e2e;
+      border: 1px solid #4a4a4a;
+      color: #eaeaea;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.72rem;
+      line-height: 1.25;
+    }
+
+    .patch-box.signal {
+      border-color: rgba(192, 224, 133, 0.72);
+      color: #d9ef9a;
+    }
+
+    .patch-box.muted {
+      color: rgba(234, 234, 234, 0.64);
+    }
+
+    .scrap-card {
+      overflow: hidden;
+    }
+
+    .scrap-copy {
+      display: grid;
+      gap: 0.75rem;
+      padding-top: 1rem;
+    }
+
+    .footer {
+      width: min(var(--max-width), calc(100vw - 2rem));
+      margin: 0 auto;
+      padding: 0 0 2.5rem;
+    }
+
+    .footer-panel {
+      border-radius: 24px;
+      padding: 1.25rem;
+      background: rgba(0, 0, 0, 0.66);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .footer-links {
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      margin-bottom: 1rem;
+    }
+
+    .footer-links div {
+      padding: 0.9rem;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .footer-links strong {
+      display: block;
+      margin-bottom: 0.45rem;
+      font-size: 0.78rem;
+      color: var(--green);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .footer-note a {
+      color: var(--cyan);
       text-decoration: none;
     }
+
     @keyframes rgb-glitch {
       0% { text-shadow: 10px 3px 0 #f00, -3px 3px 0 #0f0, 3px -3px 0 #00f; }
       20% { text-shadow: 13px 3px 0 #0f0, -3px 3px 0 #00f, 3px -3px 0 #f00; }
@@ -88,23 +528,405 @@
       92% { text-shadow: none; }
       100% { text-shadow: 3px 3px 0 #f00, -3px 3px 0 #0f0, 3px -3px 0 #00f; }
     }
+
+    @media (max-width: 820px) {
+      .topbar-inner {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .nav {
+        justify-content: flex-start;
+      }
+
+      .hero {
+        min-height: auto;
+        padding-top: 7rem;
+      }
+    }
   </style>
 </head>
 <body>
   <div id="container" aria-hidden="true"></div>
-  <div class="overlay">
-    <h1 class="title">𝖊𝖗𝖗𝖔𝖗 𝖉𝖎𝖋𝖋𝖚𝖘𝖎𝖔𝖓</h1>
+  <div class="scanlines" aria-hidden="true"></div>
+
+  <div class="page">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <p class="wordmark">error diffusion archive</p>
+        <nav class="nav" aria-label="Section navigation">
+          <a href="#news">News</a>
+          <a href="#max-packs">Max Packs</a>
+          <a href="#samples">Samples</a>
+          <a href="#gig-posters">Gig Posters</a>
+          <a href="#gig-scrap">Gig Scrap</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-panel">
+          <span class="eyebrow">live systems / sketches / residue / archive</span>
+          <h1 class="title">𝖊𝖗𝖗𝖔𝖗 𝖉𝖎𝖋𝖋𝖚𝖘𝖎𝖔𝖓</h1>
+          <p class="hero-copy">
+            The old one-page holding screen is now a live archive. Max for Live patches, network-audio experiments,
+            sample fragments, poster artefacts, and the rough operational notes that used to sit loose in the repo root
+            are collected here without scrubbing away the original mess entirely.
+          </p>
+          <div class="hero-actions">
+            <a class="action" href="#max-packs">Open Max Packs</a>
+            <a class="action" href="#samples">Browse Samples</a>
+            <a class="action" href="#gig-posters">View Posters</a>
+          </div>
+          <div class="meta-grid">
+            <div class="meta-card">
+              <strong>Nameservers</strong>
+              <p>darl.ns.cloudflare.com<br>elisabeth.ns.cloudflare.com</p>
+            </div>
+            <div class="meta-card">
+              <strong>Backup</strong>
+              <p><a href="https://aday1.github.io/error-diffusion/">aday1.github.io/error-diffusion</a></p>
+            </div>
+            <div class="meta-card">
+              <strong>Archive Split</strong>
+              <p>max packs / samples / posters / gig scrap / docs / live control artifacts</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="news">
+        <div class="section-panel">
+          <div class="section-header">
+            <span class="section-label">News</span>
+            <h2 class="section-title">Recent Signals</h2>
+            <p class="section-intro">
+              A small changelog section so the site does something more useful than a parked domain page.
+            </p>
+          </div>
+          <div class="news-list">
+            <article class="news-item">
+              <span class="news-date">May 2026</span>
+              <h3>Archive rebuild</h3>
+              <p>
+                The website now exposes the repo as a browsable archive instead of a splash screen, and the loose root
+                assets have been regrouped into cleaner library folders.
+              </p>
+            </article>
+            <article class="news-item">
+              <span class="news-date">Recovered material</span>
+              <h3>Live-system docs surfaced</h3>
+              <p>
+                OSC routing notes, shader references, TouchOSC controller layouts, and the Max TCP audio experiments are
+                now linked directly from the site instead of buried in top-level text files.
+              </p>
+            </article>
+            <article class="news-item">
+              <span class="news-date">Patch notes</span>
+              <h3>TCP audio stack documented</h3>
+              <p>
+                JACK routing setup, localhost port 7474 transport, latency polling, and the Curtis-facing capture buffers
+                are now described on the page instead of only surviving as README fragments and patch screenshots.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="max-packs">
+        <div class="section-panel">
+          <div class="section-header">
+            <span class="section-label">Max Packs</span>
+            <h2 class="section-title">Patch Systems</h2>
+            <p class="section-intro">
+              Networked audio, control plumbing, and live patch fragments collected into one place.
+            </p>
+          </div>
+          <div class="card-grid">
+            <article class="card">
+              <span class="tag">Core Pack</span>
+              <h3>Error Diff TCP Audio</h3>
+              <p>
+                The 2020 Max/MSP transport experiments for routing raw audio and control data over TCP, including setup
+                notes and future directions.
+              </p>
+              <div class="link-row">
+                <a href="/library/max-packs/error-diff-tcp/ediff_networkAudio.maxpat">ediff_networkAudio.maxpat</a>
+                <a href="/library/max-packs/error-diff-tcp/easyTCPtest.maxpat">easyTCPtest.maxpat</a>
+                <a href="/library/max-packs/error-diff-tcp/README.md">README</a>
+              </div>
+            </article>
+            <article class="card">
+              <span class="tag">Controller</span>
+              <h3>TouchOSC Resolume Layout</h3>
+              <p>
+                The performance controller template used to push shader and FX values into the live visual stack, with
+                faders for FX, RGB color shifts, transforms, scale, and indexed shader selection.
+              </p>
+              <div class="link-row">
+                <a href="/library/performance/touchosc/Aday-2019-Resolume5-VJ.touchosc">Download layout</a>
+                <a href="/library/docs/glsl-osc-messages.txt">OSC message map</a>
+                <a href="/library/docs/osc-addresses-max-umenu.csv">Address CSV</a>
+              </div>
+            </article>
+            <article class="card">
+              <span class="tag">Utility</span>
+              <h3>Live Routing Support Files</h3>
+              <p>
+                Extra support utilities and project scaffolding that were previously floating at the top of the repo.
+              </p>
+              <div class="link-row">
+                <a href="/library/performance/toe/osc.toe">osc.toe</a>
+                <a href="/library/performance/tools/OSCMonitor.exe">OSCMonitor.exe</a>
+                <a href="/library/docs/gig-notes.txt">gig notes</a>
+              </div>
+            </article>
+          </div>
+          <div class="patch-preview-grid">
+            <article class="patch-preview">
+              <span class="tag">Patch View</span>
+              <h3>Latency Loop Transport</h3>
+              <p>
+                Based on the screenshot you sent: localhost TCP roundtrip, connected-state routing, metro polling, and a
+                dragged-in loop source feeding the monitoring chain.
+              </p>
+              <div class="patch-window" aria-hidden="true">
+                <div class="patch-bar">Slot Machines / loop transport</div>
+                <div class="patch-canvas">
+                  <div class="patch-row">
+                    <div class="patch-box signal">jit.catch~</div>
+                    <div class="patch-box">127.0.0.1</div>
+                    <div class="patch-box">port 7474</div>
+                    <div class="patch-box">latency 0.25</div>
+                  </div>
+                  <div class="patch-row">
+                    <div class="patch-box signal">jit.net.send</div>
+                    <div class="patch-box signal">jit.net.recv</div>
+                    <div class="patch-box">connected 1</div>
+                  </div>
+                  <div class="patch-row">
+                    <div class="patch-box muted">metro 1000 @active 1</div>
+                    <div class="patch-box">getlatency</div>
+                    <div class="patch-box">route connected latency</div>
+                  </div>
+                </div>
+              </div>
+            </article>
+            <article class="patch-preview">
+              <span class="tag">Patch View</span>
+              <h3>Granular Capture Recorder</h3>
+              <p>
+                The second screenshot reads like a performance capture rack: audio routing, release timing, record-curtis
+                buffers, transport sync, and segmented playback controls in one dense patch.
+              </p>
+              <div class="patch-window" aria-hidden="true">
+                <div class="patch-bar">Granular / capture / curtis buffers</div>
+                <div class="patch-canvas">
+                  <div class="patch-row">
+                    <div class="patch-box">p audiostuff</div>
+                    <div class="patch-box">p granular</div>
+                    <div class="patch-box">release_time 120.</div>
+                    <div class="patch-box">attack_time 1.2</div>
+                  </div>
+                  <div class="patch-row">
+                    <div class="patch-box signal">jit.net.recv</div>
+                    <div class="patch-box signal">jit.release~</div>
+                    <div class="patch-box">route connected</div>
+                    <div class="patch-box">record-curtis</div>
+                  </div>
+                  <div class="patch-row">
+                    <div class="patch-box muted">metro 4n @active 1</div>
+                    <div class="patch-box">transport @tempo 90</div>
+                    <div class="patch-box">buffer~ curtis</div>
+                    <div class="patch-box">playmode $1</div>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </div>
+          <div class="detail-grid">
+            <article class="detail-card">
+              <span class="tag">System Notes</span>
+              <h3>JACK Routing Setup</h3>
+              <ul>
+                <li>Install 64-bit JACK and register JackRouter.dll as administrator.</li>
+                <li>Run Jack PortAudio and JackControl before opening the DAW environment.</li>
+                <li>Select JackRouter as both input and output device, then route through patchbay.</li>
+                <li>The original notes are Windows-first because that was the actual live transport environment.</li>
+              </ul>
+              <div class="link-row">
+                <a href="/library/max-packs/error-diff-tcp/README.md">Read full setup notes</a>
+              </div>
+            </article>
+            <article class="detail-card">
+              <span class="tag">OSC Controls</span>
+              <h3>Shader And FX Mapping</h3>
+              <ul>
+                <li>/3/fader1 to /3/fader4 drive the FX functions.</li>
+                <li>/3/fader5 to /3/fader7 handle RGB colour changes.</li>
+                <li>/3/fader8 to /3/fader12 control shifts and global scale.</li>
+                <li>Toggle banks and multitoggle indices select shader states and routing priority.</li>
+              </ul>
+              <div class="link-row">
+                <a href="/library/docs/glsl-osc-messages.txt">OSC message map</a>
+                <a href="/library/docs/osc-addresses-max-umenu.csv">Address index</a>
+              </div>
+            </article>
+            <article class="detail-card">
+              <span class="tag">Roadmap</span>
+              <h3>Where The Patch Was Heading</h3>
+              <ul>
+                <li>Multiple simultaneous ports for discrete audio channels and send/return bus logic.</li>
+                <li>Bidirectional transport control, MIDI over OSC, and envelope-followed control messages.</li>
+                <li>Clock, CV, and GLSL matrix export ideas linking audio state back into visuals.</li>
+                <li>Network error framed as a musical concept rather than a failure condition.</li>
+              </ul>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="samples">
+        <div class="section-panel">
+          <div class="section-header">
+            <span class="section-label">Samples</span>
+            <h2 class="section-title">Beats And Fragments</h2>
+            <p class="section-intro">
+              Rough cuts, FX triggers, and a few pieces that feel more useful left imperfect than polished.
+            </p>
+          </div>
+          <div class="card-grid">
+            <article class="card">
+              <span class="tag">Beat Sketch</span>
+              <h3>ADAY - RMX - beATS</h3>
+              <p>
+                One stray mixdown rescued from the old Beats folder and turned into a first-class archive item.
+              </p>
+              <div class="link-row">
+                <a href="/library/samples/beats/ADAY%20-%20RMX%20-%20beATS.mp3">Play or download MP3</a>
+              </div>
+            </article>
+            <article class="card">
+              <span class="tag">SFX Pack</span>
+              <h3>Activation And Alert Sounds</h3>
+              <p>
+                Utility sounds, spaceship prompts, and warning cues repackaged from the original SFX directory.
+              </p>
+              <div class="link-row">
+                <a href="/library/samples/sfx/CarHorn.wav">CarHorn.wav</a>
+                <a href="/library/samples/sfx/Photon.wav">Photon.wav</a>
+                <a href="/library/samples/sfx/REDALERT.wav">REDALERT.wav</a>
+              </div>
+            </article>
+            <article class="card">
+              <span class="tag">Further Leads</span>
+              <h3>Weekly Beats Notes</h3>
+              <p>
+                The gig notes file still contains a set of external Weekly Beats references and rough curation notes for
+                future sample mining.
+              </p>
+              <div class="link-row">
+                <a href="/library/docs/gig-notes.txt">Open notes</a>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="gig-posters">
+        <div class="section-panel">
+          <div class="section-header">
+            <span class="section-label">Gig Posters</span>
+            <h2 class="section-title">Flyers And Banners</h2>
+            <p class="section-intro">
+              Poster output from the performance orbit, starting with the preserved wide-format Maggie's Art Space banner.
+            </p>
+          </div>
+          <div class="poster-grid">
+            <article class="poster">
+              <img src="/library/gig-posters/maggies-art-space-3200x360.png" alt="Maggie's Art Space gig banner">
+              <div class="poster-meta">
+                <h3>Maggie's Art Space</h3>
+                <p>
+                  3200 x 360 venue banner art, now filed as a poster asset instead of living as an orphaned PNG at repo root.
+                </p>
+                <a href="/library/gig-posters/maggies-art-space-3200x360.png">Open full-size PNG</a>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="gig-scrap">
+        <div class="section-panel">
+          <div class="section-header">
+            <span class="section-label">Gig Scrap</span>
+            <h2 class="section-title">Residue, Rips, And References</h2>
+            <p class="section-intro">
+              Not polished releases. Just useful leftovers: GIF loops, shader source references, and live workflow scraps.
+            </p>
+          </div>
+          <div class="scrap-grid">
+            <article class="scrap-card">
+              <img src="/library/gig-scrap/error-defuse1.gif" alt="Error Defuse GIF loop 1">
+              <div class="scrap-copy">
+                <h3>Error Defuse Loop 01</h3>
+                <p>Recovered animated graphic from the old repo root.</p>
+                <div class="link-row">
+                  <a href="/library/gig-scrap/error-defuse1.gif">Open GIF</a>
+                </div>
+              </div>
+            </article>
+            <article class="scrap-card">
+              <img src="/library/gig-scrap/error-defuse2.gif" alt="Error Defuse GIF loop 2">
+              <div class="scrap-copy">
+                <h3>Error Defuse Loop 02</h3>
+                <p>Companion loop preserved as a scrap asset instead of a loose file.</p>
+                <div class="link-row">
+                  <a href="/library/gig-scrap/error-defuse2.gif">Open GIF</a>
+                </div>
+              </div>
+            </article>
+            <article class="scrap-card">
+              <div class="scrap-copy">
+                <h3>Shader Rips</h3>
+                <p>
+                  GLSL Sandbox references and candidate visuals for the live set, collected into a single text artifact.
+                </p>
+                <div class="link-row">
+                  <a href="/library/docs/shader-rips.txt">Open shader list</a>
+                  <a href="/library/docs/glsl-osc-messages.txt">OSC control notes</a>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-panel">
+        <div class="footer-links">
+          <div>
+            <strong>Repository</strong>
+            <p class="footer-note">Website source lives in this repo and deploys via Cloudflare Worker assets.</p>
+          </div>
+          <div>
+            <strong>Structure</strong>
+            <p class="footer-note">Everything publicly browseable now lives in the library folders instead of the root.</p>
+          </div>
+          <div>
+            <strong>Backup</strong>
+            <p class="footer-note"><a href="https://aday1.github.io/error-diffusion/">GitHub Pages mirror</a></p>
+          </div>
+        </div>
+        <p class="footer-note">
+          error diffusion keeps the glitch shader background, but the front layer now behaves like an archive instead of a placeholder.
+        </p>
+      </div>
+    </footer>
   </div>
-  <aside class="dns">
-    <p>Registrar nameservers required:</p>
-    <ul>
-      <li><code>darl.ns.cloudflare.com</code></li>
-      <li><code>elisabeth.ns.cloudflare.com</code></li>
-    </ul>
-    <p class="links">
-      Backup: <a href="https://aday1.github.io/error-diffusion/">aday1.github.io/error-diffusion</a>
-    </p>
-  </aside>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/89/three.min.js"></script>
   <script id="vertexShader" type="x-shader/x-vertex">
@@ -144,7 +966,7 @@
     var container = document.getElementById("container");
     var camera = new THREE.Camera();
     var scene = new THREE.Scene();
-    var renderer = new THREE.WebGLRenderer();
+    var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     var uniforms = {
       time: { type: "f", value: 3.0 },
       resolution: { type: "v2", value: new THREE.Vector2() }
@@ -161,7 +983,7 @@
     var mesh = new THREE.Mesh(geometry, material);
     scene.add(mesh);
 
-    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     container.appendChild(renderer.domElement);
 
     function onWindowResize() {
