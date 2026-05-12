@@ -340,15 +340,17 @@
         <a href="https://aday1.github.io/error-diffusion/">GitHub Pages backup</a>
       </div>
       <div class="lexicon" aria-label="Max patch lexicon">
-        <span class="chip catch">jit.catch~</span>
-        <span class="chip catch">jit.net.recv</span>
-        <span class="chip metro">metro 4n @active 1</span>
-        <span class="chip">route connected latency</span>
-        <span class="chip">threshold 0.125</span>
-        <span class="chip">attack_time 1.2</span>
+        <span class="chip">p audiostuff</span>
+        <span class="chip">p granular</span>
         <span class="chip">release_time 120.</span>
+        <span class="chip">attack_time 1.2</span>
+        <span class="chip catch">jit.net.recv</span>
         <span class="chip release">jit.release~</span>
-        <span class="chip">record-curtis 2</span>
+        <span class="chip">route connected</span>
+        <span class="chip">record-curtis</span>
+        <span class="chip metro">metro 4n @active 1</span>
+        <span class="chip">transport @tempo 90</span>
+        <span class="chip">buffer~ curtis</span>
         <span class="chip">playmode $1</span>
       </div>
     </section>
@@ -379,9 +381,8 @@
 
     <section class="ticker">
       <div class="ticker-line">
-        error-diffusion :: jit.catch~ :: jit.net.recv :: tcp 7474 :: route connected latency :: threshold 0.125 :: attack_time 1.2 :: release_time 120. ::
-        jit.release~ :: record-curtis 2 :: buffer~ curtis @size 60000 2 :: metro 4n @active 1 :: transport @tempo 90 :: playmode $1 :: freq 220. ::
-        error-diffusion :: jit.catch~ :: jit.net.recv :: tcp 7474 :: route connected latency :: threshold 0.125 :: attack_time 1.2 :: release_time 120. ::
+        p audiostuff :: p granular :: release_time 120. :: attack_time 1.2 :: jit.net.recv :: jit.release~ :: route connected :: record-curtis ::
+        metro 4n @active 1 :: transport @tempo 90 :: buffer~ curtis :: playmode $1 :: p audiostuff :: p granular :: release_time 120. ::
       </div>
     </section>
   </main>
