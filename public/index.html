@@ -4,130 +4,272 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>𝖊𝖗𝖗𝖔𝖗 𝖉𝖎𝖋𝖋𝖚𝖘𝖎𝖔𝖓</title>
-  <meta name="description" content="Error diffusion signal archive and glitch studies.">
+  <meta name="description" content="Error Diffusion Max/MSP archive, OSC shader notes, glitch scraps, and reactive creative-code signal debris.">
+  <meta name="theme-color" content="#090007">
   <style>
     :root {
       color-scheme: dark;
-      --fg: #d9ddd2;
-      --muted: #9fa794;
-      --line: rgba(255, 255, 255, 0.16);
-      --panel: rgba(5, 5, 5, 0.86);
-      --cyan: #9ab7a5;
-      --magenta: #af789a;
-      --lime: #a7b280;
-      --jit-catch-signal: #89f5ff;
-      --jit-release-signal: #ff4ac7;
-      --metro-clock-signal: #b9ff7a;
+      --bg: #050005;
+      --bg-deep: #000000;
+      --panel: rgba(12, 2, 9, 0.88);
+      --panel-hot: rgba(32, 3, 16, 0.78);
+      --fg: #e5ffe9;
+      --ink: #e8fff0;
+      --muted: #9cc8a8;
+      --dim: #668373;
+      --line: rgba(153, 255, 177, 0.26);
+      --line-hot: rgba(255, 89, 171, 0.42);
+      --red: #ff315f;
+      --green: #8fff93;
+      --blue: #6ed8ff;
+      --cyan: #8cf6ff;
+      --magenta: #ff4fbd;
+      --amber: #ffd166;
+      --rgb-shift: 5px;
+      --tear: 0.4;
+      --diffusion-cell: 9px;
+      --hue: 0deg;
+      --pulse: 0.35;
+      --font: Consolas, "Lucida Console", "Courier New", monospace;
+      --display: "Audiowide", "Segoe UI", Tahoma, sans-serif;
     }
 
     * { box-sizing: border-box; }
-    html, body { margin: 0; min-height: 100%; background: #000; color: var(--fg); }
-    body {
-      font-family: "Audiowide", "Segoe UI", Tahoma, sans-serif;
-      overflow-x: hidden;
-      text-shadow: 0 0 1px rgba(0, 0, 0, 0.7);
+
+    html {
+      min-height: 100%;
+      background: #000;
+      scroll-behavior: smooth;
     }
 
-    #shader {
+    body {
+      margin: 0;
+      min-height: 100%;
+      overflow-x: hidden;
+      background:
+        radial-gradient(circle at 20% -10%, rgba(255, 49, 95, 0.2), transparent 34rem),
+        radial-gradient(circle at 88% 6%, rgba(110, 216, 255, 0.13), transparent 30rem),
+        radial-gradient(circle at 52% 118%, rgba(143, 255, 147, 0.12), transparent 34rem),
+        linear-gradient(180deg, #100006 0%, #040004 48%, #000 100%);
+      color: var(--fg);
+      font-family: var(--font);
+      text-shadow: 0 0 6px rgba(143, 255, 147, 0.18);
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    body::before {
+      background:
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.08) 0 1px, rgba(0, 0, 0, 0.42) 1px 3px, transparent 3px 5px),
+        repeating-linear-gradient(90deg, rgba(255, 0, 0, 0.08) 0 1px, rgba(0, 255, 80, 0.06) 1px 2px, rgba(0, 140, 255, 0.07) 2px 3px, transparent 3px 7px);
+      opacity: 0.76;
+      mix-blend-mode: screen;
+    }
+
+    body::after {
+      background:
+        radial-gradient(circle at 50% 40%, transparent 39%, rgba(0, 0, 0, 0.42) 73%, rgba(0, 0, 0, 0.82) 100%),
+        linear-gradient(90deg, rgba(255, 49, 95, calc(var(--pulse) * 0.16)), transparent 24%, transparent 76%, rgba(110, 216, 255, calc(var(--pulse) * 0.12)));
+      mix-blend-mode: multiply;
+    }
+
+    a {
+      color: var(--cyan);
+      text-decoration: none;
+    }
+
+    a:hover,
+    a:focus-visible {
+      color: #fff;
+      text-shadow: 0 0 12px currentColor;
+    }
+
+    a:focus-visible,
+    button:focus-visible {
+      outline: 2px solid var(--amber);
+      outline-offset: 3px;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .diffusion-canvas {
       position: fixed;
       inset: 0;
       z-index: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0.72;
+      filter: hue-rotate(var(--hue)) saturate(1.28) contrast(1.08);
+      pointer-events: none;
+    }
+
+    .fallback-field {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        repeating-conic-gradient(from 90deg at 50% 50%, rgba(255, 49, 95, 0.12) 0 8deg, transparent 8deg 18deg, rgba(110, 216, 255, 0.11) 18deg 23deg, transparent 23deg 42deg),
+        radial-gradient(circle at 50% 48%, rgba(143, 255, 147, 0.2), transparent 35%),
+        #030004;
+      opacity: 0.58;
+      filter: blur(0.3px);
+    }
+
+    .noise,
+    .diffusion-mask,
+    .vhs-tear,
+    .phosphor-fog,
+    .boot-overlay {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
     }
 
     .noise {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 1;
-      opacity: 0.2;
+      z-index: 2;
+      opacity: 0.18;
       mix-blend-mode: screen;
-      background-image: radial-gradient(circle, rgba(255,255,255,0.35) 0.8px, transparent 0.8px);
-      background-size: 7px 7px;
-      animation: noise-shift 0.22s steps(2) infinite;
-    }
-
-    .noise-heavy {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 1;
-      opacity: 0.14;
-      mix-blend-mode: soft-light;
       background-image:
-        radial-gradient(circle, rgba(255, 240, 180, 0.5) 0.8px, transparent 0.8px),
-        radial-gradient(circle, rgba(140, 180, 200, 0.4) 0.8px, transparent 0.8px);
-      background-size: 9px 9px, 11px 11px;
-      background-position: 0 0, 3px 5px;
-      animation: noise-drift 0.3s steps(2) infinite;
+        radial-gradient(circle, rgba(255, 255, 255, 0.9) 0 0.8px, transparent 0.85px),
+        radial-gradient(circle, rgba(143, 255, 147, 0.75) 0 0.7px, transparent 0.75px);
+      background-size: 3px 3px, 5px 5px;
+      animation: static-slip 180ms steps(2, end) infinite;
     }
 
-    .scan {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
+    .diffusion-mask {
       z-index: 1;
       opacity: 0.18;
-      background-image: linear-gradient(to bottom, rgba(255,255,255,0.04), rgba(255,255,255,0.01) 1px, transparent 1px, transparent 4px);
-      background-size: 100% 4px;
-    }
-
-    .phosphor {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 1;
-      opacity: 0.1;
-      mix-blend-mode: overlay;
       background:
-        repeating-linear-gradient(
-          90deg,
-          rgba(255, 0, 0, 0.15) 0 1px,
-          rgba(0, 255, 0, 0.15) 1px 2px,
-          rgba(0, 120, 255, 0.15) 2px 3px,
-          transparent 3px 6px
-        );
-      animation: phosphor-drift 9s linear infinite;
-    }
-
-    .vhs-warp {
-      position: fixed;
-      inset: -4%;
-      pointer-events: none;
-      z-index: 1;
-      opacity: 0.14;
+        radial-gradient(circle, rgba(255, 255, 255, 0.22) 0 1px, transparent 1px),
+        linear-gradient(135deg, rgba(255, 49, 95, 0.12), transparent 35%, rgba(110, 216, 255, 0.12));
+      background-size: var(--diffusion-cell) var(--diffusion-cell), 100% 100%;
       mix-blend-mode: screen;
-      background: radial-gradient(circle at 20% 10%, rgba(255, 0, 160, 0.34), transparent 45%),
-                  radial-gradient(circle at 80% 80%, rgba(0, 220, 255, 0.28), transparent 42%);
-      animation: warp-roll 8s ease-in-out infinite alternate;
+      animation: diffusion-crawl 900ms steps(4, end) infinite;
     }
 
-    .vignette-round {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 2;
+    .vhs-tear {
+      z-index: 4;
+      opacity: calc(0.22 + var(--tear) * 0.24);
       background:
-        radial-gradient(circle at 50% 40%, transparent 42%, rgba(0, 0, 0, 0.36) 68%, rgba(0, 0, 0, 0.72) 100%);
-      mix-blend-mode: multiply;
-      opacity: 0.95;
+        linear-gradient(180deg, transparent 0 18%, rgba(255, 255, 255, 0.18) 18.4%, rgba(255, 49, 95, 0.13) 19%, transparent 20% 41%, rgba(110, 216, 255, 0.16) 41.2%, transparent 42% 72%, rgba(255, 255, 255, 0.1) 72.3%, transparent 73%),
+        repeating-linear-gradient(0deg, transparent 0 37px, rgba(255, 255, 255, 0.08) 38px, transparent 39px 64px);
+      mix-blend-mode: screen;
+      transform: translateX(calc((var(--tear) - 0.5) * 18px));
+      animation: tear-roll 4.8s steps(4, end) infinite;
     }
 
-    .page {
+    .phosphor-fog {
+      z-index: 1;
+      opacity: 0.48;
+      mix-blend-mode: screen;
+      background:
+        radial-gradient(circle at calc(20% + var(--pulse) * 30%) 22%, rgba(255, 49, 95, 0.18), transparent 28rem),
+        radial-gradient(circle at calc(86% - var(--pulse) * 26%) 78%, rgba(110, 216, 255, 0.16), transparent 32rem),
+        radial-gradient(circle at 50% 45%, rgba(143, 255, 147, 0.09), transparent 22rem);
+      filter: blur(5px);
+    }
+
+    .boot-overlay {
+      z-index: 20;
+      display: grid;
+      place-items: center;
+      background: radial-gradient(circle at 50% 50%, rgba(23, 0, 10, 0.98), #000 72%);
+      color: var(--green);
+      animation: boot-hide 4.1s steps(1, end) forwards;
+    }
+
+    .boot-overlay::before {
+      content: "";
+      position: absolute;
+      inset: -20%;
+      background:
+        repeating-linear-gradient(0deg, rgba(143, 255, 147, 0.16) 0 1px, transparent 1px 4px),
+        repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.09) 0 1px, transparent 1px 3px);
+      mix-blend-mode: screen;
+      animation: static-slip 90ms steps(2, end) infinite;
+    }
+
+    .boot-overlay::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 50%;
+      height: 3px;
+      transform: translateY(-50%) scaleX(0.04);
+      transform-origin: center;
+      background: linear-gradient(90deg, transparent, rgba(232, 255, 240, 0.98), transparent);
+      box-shadow: 0 0 24px rgba(143, 255, 147, 0.9), 0 0 68px rgba(255, 49, 95, 0.62);
+      animation: boot-line 1100ms cubic-bezier(0.12, 0.72, 0.1, 1) forwards;
+    }
+
+    .boot-card {
       position: relative;
       z-index: 2;
-      width: min(1180px, calc(100vw - 2rem));
+      width: min(680px, 82vw);
+      border: 1px solid rgba(143, 255, 147, 0.44);
+      background: rgba(0, 0, 0, 0.72);
+      padding: clamp(1rem, 3vw, 1.7rem);
+      box-shadow: 0 0 42px rgba(143, 255, 147, 0.18), inset 0 0 30px rgba(255, 49, 95, 0.15);
+      clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px));
+      animation: boot-card-flicker 820ms steps(2, end) 3;
+    }
+
+    .boot-card strong {
+      display: block;
+      color: #fff;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      margin-bottom: 0.55rem;
+    }
+
+    .boot-card span {
+      display: block;
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: 0.92rem;
+    }
+
+    .shell {
+      position: relative;
+      z-index: 5;
+      width: min(1240px, calc(100vw - 1.4rem));
       margin: 0 auto;
-      padding: 2rem 0 3rem;
-      isolation: isolate;
+      padding: clamp(0.8rem, 2vw, 1.4rem) 0 4rem;
+    }
+
+    .hero {
+      min-height: calc(100svh - 2rem);
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(310px, 0.92fr);
+      gap: clamp(1rem, 3vw, 1.6rem);
+      align-items: stretch;
+      padding-top: clamp(1rem, 3vw, 2rem);
     }
 
     .panel {
-      border: 1px solid var(--line);
-      background: var(--panel);
-      backdrop-filter: blur(8px);
-      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.45);
-      clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px));
       position: relative;
+      border: 1px solid var(--line);
+      background:
+        radial-gradient(circle at 14% 10%, rgba(255, 49, 95, 0.12), transparent 36%),
+        radial-gradient(circle at 90% 18%, rgba(110, 216, 255, 0.08), transparent 28%),
+        linear-gradient(180deg, rgba(17, 2, 10, 0.94), rgba(4, 0, 4, 0.89));
+      box-shadow:
+        0 26px 90px rgba(0, 0, 0, 0.64),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+        inset 0 0 44px rgba(143, 255, 147, 0.05);
+      clip-path: polygon(0 0, calc(100% - 24px) 0, 100% 24px, 100% 100%, 24px 100%, 0 calc(100% - 24px));
+      overflow: hidden;
     }
 
     .panel::before {
@@ -135,37 +277,47 @@
       position: absolute;
       inset: 0;
       pointer-events: none;
-      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.25));
+      background:
+        linear-gradient(90deg, rgba(255, 49, 95, 0.08), transparent 18%, transparent 82%, rgba(110, 216, 255, 0.09)),
+        repeating-linear-gradient(0deg, transparent 0 17px, rgba(255, 255, 255, 0.04) 18px, transparent 19px 37px);
       mix-blend-mode: screen;
+      opacity: 0.65;
     }
 
-    .hero {
-      min-height: calc(100svh - 5rem);
+    .hero-copy {
       display: grid;
       align-content: center;
-      gap: 1.2rem;
-      padding: clamp(1.4rem, 4vw, 2.6rem);
+      gap: 1rem;
+      padding: clamp(1.1rem, 4vw, 2.2rem);
     }
 
-    .tagline {
+    .sysline {
+      position: relative;
+      z-index: 1;
       margin: 0;
       color: var(--muted);
-      letter-spacing: 0.2em;
       text-transform: uppercase;
-      font-size: 0.75rem;
+      letter-spacing: 0.16em;
+      font-size: clamp(0.68rem, 1.4vw, 0.82rem);
     }
 
     .glitch {
       position: relative;
+      z-index: 1;
       margin: 0;
-      font-size: clamp(2.4rem, 11vw, 8rem);
-      line-height: 0.92;
-      letter-spacing: 0.08em;
-      text-transform: lowercase;
       color: #fff;
-      text-shadow: 3px 3px 0 #f00, -3px 3px 0 #0f0, 3px -3px 0 #00f;
-      animation: rgb-jitter 530ms ease-in-out infinite alternate;
-      filter: contrast(1.15);
+      font-family: var(--display);
+      font-size: clamp(2.55rem, 9.8vw, 8.7rem);
+      line-height: 0.9;
+      letter-spacing: 0.075em;
+      text-transform: lowercase;
+      text-shadow:
+        calc(var(--rgb-shift) * 1.15) 2px 0 rgba(255, 49, 95, 0.9),
+        calc(var(--rgb-shift) * -0.7) 3px 0 rgba(143, 255, 147, 0.78),
+        2px -2px 0 rgba(110, 216, 255, 0.82),
+        0 0 28px rgba(255, 255, 255, 0.16);
+      filter: contrast(1.18);
+      animation: title-jitter 700ms steps(2, end) infinite;
     }
 
     .glitch::before,
@@ -174,439 +326,1299 @@
       position: absolute;
       inset: 0;
       pointer-events: none;
+      opacity: 0.7;
     }
 
     .glitch::before {
       color: var(--magenta);
-      clip-path: polygon(0 7%, 100% 2%, 100% 26%, 0 33%);
-      transform: translate(2px, -1px);
-      opacity: 0.58;
-      animation: slice-a 1500ms steps(2) infinite;
+      transform: translate(calc(var(--rgb-shift) * 0.7), -1px);
+      clip-path: polygon(0 6%, 100% 2%, 100% 24%, 0 31%, 0 58%, 100% 52%, 100% 63%, 0 69%);
+      animation: title-slice-a 1.35s steps(2, end) infinite;
     }
 
     .glitch::after {
       color: var(--cyan);
-      clip-path: polygon(0 62%, 100% 55%, 100% 86%, 0 92%);
-      transform: translate(-2px, 1px);
-      opacity: 0.58;
-      animation: slice-b 1200ms steps(2) infinite;
+      transform: translate(calc(var(--rgb-shift) * -0.65), 1px);
+      clip-path: polygon(0 35%, 100% 31%, 100% 45%, 0 51%, 0 74%, 100% 70%, 100% 93%, 0 99%);
+      animation: title-slice-b 1.1s steps(2, end) infinite;
     }
 
     .summary {
+      position: relative;
+      z-index: 1;
+      max-width: 72ch;
       margin: 0;
-      max-width: 62ch;
-      color: var(--muted);
-      font-family: Consolas, "Courier New", monospace;
-      line-height: 1.7;
-      background: rgba(0, 0, 0, 0.35);
-      padding: 0.45rem 0.65rem;
+      color: var(--ink);
+      line-height: 1.65;
+      background: rgba(0, 0, 0, 0.48);
+      border-left: 3px solid var(--green);
+      padding: 0.8rem 0.92rem;
     }
 
-    .nameserver {
-      display: inline-block;
-      margin-right: 0.6rem;
-      margin-top: 0.4rem;
-      border: 1px solid var(--line);
-      border-radius: 0;
-      padding: 0.35rem 0.7rem;
-      font-family: Consolas, "Courier New", monospace;
-      font-size: 0.82rem;
-      color: var(--lime);
-      background: rgba(255,255,255,0.03);
-    }
-
-    .links {
+    .signal-row,
+    .links,
+    .lexicon {
+      position: relative;
+      z-index: 1;
       display: flex;
       flex-wrap: wrap;
-      gap: 0.7rem;
-      margin-top: 0.35rem;
+      gap: 0.55rem;
     }
 
+    .badge,
+    .chip,
     .links a {
-      text-decoration: none;
       border: 1px solid var(--line);
-      border-radius: 0;
-      padding: 0.46rem 0.9rem;
+      background: rgba(0, 0, 0, 0.36);
+      color: var(--muted);
+      padding: 0.38rem 0.62rem;
       font-size: 0.78rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--fg);
-      background: rgba(255,255,255,0.03);
+      line-height: 1;
       clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
     }
 
-    .lexicon {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.45rem;
-      margin-top: 0.5rem;
+    .badge.hot,
+    .chip.hot {
+      color: var(--magenta);
+      border-color: var(--line-hot);
     }
 
-    .chip {
-      border: 1px solid var(--line);
-      border-radius: 0;
-      padding: 0.3rem 0.62rem;
-      font-family: Consolas, "Courier New", monospace;
-      font-size: 0.75rem;
-      color: var(--muted);
-      background: rgba(255,255,255,0.03);
-      clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+    .badge.green,
+    .chip.green {
+      color: var(--green);
+      border-color: rgba(143, 255, 147, 0.42);
     }
 
-    .chip.catch { color: var(--jit-catch-signal); border-color: rgba(137, 245, 255, 0.35); }
-    .chip.release { color: var(--jit-release-signal); border-color: rgba(255, 74, 199, 0.35); }
-    .chip.metro { color: var(--metro-clock-signal); border-color: rgba(185, 255, 122, 0.35); }
-
-    .grid {
-      margin-top: 1.2rem;
-      display: grid;
-      gap: 1rem;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    }
-
-    .card {
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,0.03);
-      padding: 0.9rem;
-      overflow: hidden;
-      clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
-      transform: skewY(-0.5deg);
-      position: relative;
-    }
-
-    .card::before {
-      content: "";
-      position: absolute;
-      left: -10%;
-      width: 120%;
-      top: 35%;
-      height: 2px;
-      background: rgba(255, 255, 255, 0.2);
-      filter: blur(0.6px);
-      opacity: 0.45;
-      animation: line-tear 2200ms steps(2) infinite;
-      pointer-events: none;
-    }
-
-    .card h2 {
-      margin: 0 0 0.7rem;
-      font-size: 0.9rem;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
+    .badge.blue,
+    .chip.blue {
       color: var(--cyan);
+      border-color: rgba(140, 246, 255, 0.42);
     }
 
-    .shot {
+    .links a {
+      color: var(--fg);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+    }
+
+    .links a:hover,
+    .links a:focus-visible {
+      transform: translateY(-2px);
+      border-color: var(--cyan);
+      box-shadow: 0 0 18px rgba(110, 216, 255, 0.22);
+    }
+
+    .crt-panel {
+      min-height: 100%;
+      padding: clamp(0.75rem, 2vw, 1rem);
+      align-self: stretch;
+      display: grid;
+      align-content: center;
+      gap: 0.8rem;
+    }
+
+    .crt-head {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      justify-content: space-between;
+      gap: 0.8rem;
+      color: var(--green);
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .crt-frame {
+      position: relative;
+      z-index: 1;
+      border: 2px solid rgba(145, 184, 245, 0.58);
+      background:
+        linear-gradient(180deg, rgba(23, 45, 74, 0.88), rgba(9, 16, 31, 0.94));
+      padding: clamp(0.55rem, 1.2vw, 0.86rem);
+      box-shadow: inset 0 0 28px rgba(110, 216, 255, 0.12), 0 0 28px rgba(110, 216, 255, 0.15);
+    }
+
+    .screen {
       position: relative;
       overflow: hidden;
-      border: 1px solid rgba(255,255,255,0.14);
-      background: #080808;
-      min-height: 180px;
-      clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+      aspect-ratio: 16 / 10;
+      min-height: 260px;
+      border: 1px solid rgba(210, 233, 255, 0.55);
+      background:
+        radial-gradient(circle at 50% 45%, rgba(19, 47, 70, 0.72), #020308 72%);
+      box-shadow: inset 0 0 90px rgba(0, 0, 0, 0.88);
     }
 
-    .shot img {
-      display: block;
-      width: 100%;
-      height: auto;
-    }
-
-    .shot.glitch-a img {
-      filter: saturate(1.2) contrast(1.08) hue-rotate(12deg);
-      animation: wobble 1300ms ease-in-out infinite alternate, datamosh-a 1800ms steps(2) infinite;
-    }
-
-    .shot.glitch-b img {
-      filter: grayscale(0.2) contrast(1.25);
-      transform: scale(1.01);
-    }
-
-    .shot.glitch-b::before,
-    .shot.glitch-b::after {
+    .screen::before,
+    .screen::after {
       content: "";
       position: absolute;
       inset: 0;
       pointer-events: none;
+      z-index: 3;
     }
 
-    .shot.glitch-b::before {
-      background: linear-gradient(90deg, rgba(255,0,120,0.12), transparent 40%, rgba(0,255,255,0.15));
+    .screen::before {
+      background:
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.11) 0 1px, rgba(0, 0, 0, 0.35) 1px 3px, transparent 3px 5px),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 12%, transparent 84%, rgba(0, 0, 0, 0.32));
       mix-blend-mode: screen;
-      animation: drift 2200ms linear infinite;
+      opacity: 0.82;
+      animation: screen-roll 2.1s steps(4, end) infinite;
     }
 
-    .shot.glitch-b::after {
-      background-image: repeating-linear-gradient(0deg, rgba(255,255,255,0.08) 0 1px, transparent 1px 3px);
-      opacity: 0.16;
+    .screen::after {
+      background:
+        radial-gradient(circle at 16% 22%, rgba(255, 49, 95, 0.22), transparent 38%),
+        radial-gradient(circle at 76% 74%, rgba(110, 216, 255, 0.2), transparent 42%),
+        radial-gradient(circle at center, transparent 40%, rgba(0, 0, 0, 0.7) 100%);
+      mix-blend-mode: screen;
+      opacity: 0.85;
     }
 
-    .shot.glitch-c img {
-      filter: hue-rotate(210deg) contrast(1.1) brightness(0.95);
-      animation: rgb-jitter 800ms ease-in-out infinite alternate, datamosh-b 1600ms steps(2) infinite;
+    .media-stack,
+    .media-plane,
+    .media-plane img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
     }
 
-    .card p {
-      margin: 0.75rem 0 0;
+    .media-plane {
+      opacity: 0;
+      transform: scale(1.03);
+      transition: opacity 320ms steps(2, end), transform 420ms ease;
+    }
+
+    .media-plane.active {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .media-plane img {
+      object-fit: cover;
+      filter: saturate(1.28) contrast(1.18) hue-rotate(var(--hue));
+    }
+
+    .media-plane.patch img {
+      object-fit: contain;
+      background: #07070a;
+      filter: saturate(1.05) contrast(1.24) hue-rotate(var(--hue));
+    }
+
+    .media-plane.poster img {
+      object-fit: cover;
+      image-rendering: auto;
+      filter: saturate(1.4) contrast(1.22) hue-rotate(calc(var(--hue) + 18deg));
+    }
+
+    .media-plane::before,
+    .media-plane::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .media-plane::before {
+      background: linear-gradient(90deg, rgba(255, 49, 95, 0.2), transparent 42%, rgba(110, 216, 255, 0.18));
+      mix-blend-mode: screen;
+      transform: translateX(calc((var(--tear) - 0.5) * 20px));
+      animation: chroma-drift 2.8s linear infinite alternate;
+    }
+
+    .media-plane::after {
+      background:
+        linear-gradient(180deg, transparent 0 24%, rgba(255, 255, 255, 0.18) 24.4%, rgba(255, 49, 95, 0.14) 25.2%, transparent 26% 61%, rgba(110, 216, 255, 0.15) 61.5%, transparent 63%),
+        repeating-linear-gradient(0deg, transparent 0 21px, rgba(255, 255, 255, 0.07) 22px, transparent 24px);
+      mix-blend-mode: screen;
+      opacity: 0.72;
+      animation: line-tear 1.6s steps(3, end) infinite;
+    }
+
+    .screen-burst {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 44%;
+      z-index: 4;
+      height: 7px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9), rgba(143, 255, 147, 0.58), transparent);
+      box-shadow: 0 0 18px rgba(143, 255, 147, 0.7);
+      opacity: calc(0.16 + var(--tear) * 0.4);
+      transform: translateY(calc((var(--tear) - 0.5) * 90px));
+      animation: burst-scan 3.4s steps(5, end) infinite;
+    }
+
+    .screen-osd {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.8rem;
+      padding: clamp(0.6rem, 2vw, 1rem);
+      pointer-events: none;
+    }
+
+    .channel {
+      color: var(--green);
+      background: rgba(0, 0, 0, 0.62);
+      border: 1px solid rgba(143, 255, 147, 0.4);
+      padding: 0.28rem 0.45rem;
+      text-shadow: 0 0 11px rgba(143, 255, 147, 0.9);
+      font-size: 0.78rem;
+    }
+
+    .osd-menu {
+      pointer-events: auto;
+      width: min(245px, 45vw);
+      border: 1px solid rgba(151, 188, 229, 0.78);
+      background: rgba(2, 8, 17, 0.78);
+      box-shadow: inset 0 0 16px rgba(110, 216, 255, 0.16);
+      backdrop-filter: blur(2px);
+    }
+
+    .osd-menu header,
+    .osd-menu footer {
+      padding: 0.35rem 0.5rem;
+      color: #d9efff;
+      border-bottom: 1px solid rgba(151, 188, 229, 0.48);
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .osd-menu footer {
+      border-top: 1px solid rgba(151, 188, 229, 0.48);
+      border-bottom: 0;
+      color: var(--dim);
+    }
+
+    .feed-list {
+      margin: 0;
+      padding: 0.35rem;
+      list-style: none;
+      display: grid;
+      gap: 0.22rem;
+    }
+
+    .feed-button {
+      width: 100%;
+      border: 0;
+      border-left: 3px solid transparent;
+      background: transparent;
+      color: var(--green);
+      cursor: pointer;
+      text-align: left;
+      padding: 0.25rem 0.38rem;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .feed-button:hover,
+    .feed-button.active {
+      background: rgba(143, 255, 147, 0.18);
+      border-left-color: var(--green);
+      color: #fff;
+      animation: osd-jump 1.2s steps(2, end) infinite;
+    }
+
+    .now-playing {
+      position: relative;
+      z-index: 1;
       color: var(--muted);
-      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.82rem;
       line-height: 1.5;
-      font-size: 0.9rem;
+    }
+
+    .quick-jump {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.55rem;
+    }
+
+    .quick-jump a {
+      border: 1px solid rgba(110, 216, 255, 0.28);
+      background: rgba(2, 8, 17, 0.52);
+      color: var(--cyan);
+      padding: 0.58rem 0.62rem;
+      font-size: 0.78rem;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+    }
+
+    .section {
+      margin-top: 1rem;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 1rem;
+      margin: 0 0 0.65rem;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      color: #fff;
+      font-size: clamp(1.05rem, 2vw, 1.45rem);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-shadow: 0 0 18px rgba(110, 216, 255, 0.28);
+    }
+
+    .section-head p {
+      margin: 0;
+      max-width: 48ch;
+      color: var(--muted);
+      font-size: 0.82rem;
+      text-align: right;
+      line-height: 1.45;
+    }
+
+    .matrix {
+      padding: clamp(0.85rem, 2vw, 1rem);
+    }
+
+    .fx-grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 0.55rem;
+    }
+
+    .fx-cell {
+      min-height: 92px;
+      border: 1px solid rgba(143, 255, 147, 0.18);
+      background:
+        linear-gradient(180deg, rgba(6, 17, 14, 0.75), rgba(0, 0, 0, 0.42));
+      padding: 0.58rem;
+      color: var(--muted);
+      position: relative;
+      overflow: hidden;
+      clip-path: polygon(0 0, calc(100% - 11px) 0, 100% 11px, 100% 100%, 11px 100%, 0 calc(100% - 11px));
+    }
+
+    .fx-cell::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(255, 49, 95, 0.12), transparent 60%, rgba(110, 216, 255, 0.11));
+      opacity: 0;
+      transition: opacity 180ms ease;
+    }
+
+    .fx-cell.active {
+      border-color: rgba(143, 255, 147, 0.75);
+      color: #fff;
+      box-shadow: 0 0 18px rgba(143, 255, 147, 0.16), inset 0 0 18px rgba(143, 255, 147, 0.08);
+    }
+
+    .fx-cell.active::before {
+      opacity: 1;
+    }
+
+    .fx-key,
+    .fx-value,
+    .fx-label {
+      position: relative;
+      z-index: 1;
+      display: block;
+    }
+
+    .fx-key {
+      color: var(--cyan);
+      font-size: 0.7rem;
+      margin-bottom: 0.35rem;
+      word-break: break-word;
+    }
+
+    .fx-label {
+      min-height: 2.5em;
+      color: var(--fg);
+      font-size: 0.82rem;
+      line-height: 1.22;
+    }
+
+    .fx-value {
+      margin-top: 0.55rem;
+      color: var(--amber);
+      font-size: 0.76rem;
+    }
+
+    .terminal {
+      margin-top: 0.75rem;
+      border: 1px solid rgba(110, 216, 255, 0.24);
+      background: rgba(0, 0, 0, 0.52);
+      padding: 0.7rem;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.5;
+      overflow: hidden;
+    }
+
+    .terminal strong {
+      color: var(--green);
+      font-weight: 400;
+    }
+
+    .archive-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.85rem;
+    }
+
+    .archive-card {
+      min-height: 100%;
+      padding: 0.85rem;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background:
+        radial-gradient(circle at 18% 12%, rgba(255, 49, 95, 0.12), transparent 40%),
+        linear-gradient(180deg, rgba(14, 4, 12, 0.86), rgba(0, 0, 0, 0.46));
+      clip-path: polygon(0 0, calc(100% - 17px) 0, 100% 17px, 100% 100%, 17px 100%, 0 calc(100% - 17px));
+      overflow: hidden;
+      position: relative;
+    }
+
+    .archive-card::before {
+      content: "";
+      position: absolute;
+      left: -16%;
+      right: -16%;
+      top: 31%;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.22);
+      opacity: 0.2;
+      animation: card-tear 2.6s steps(3, end) infinite;
+    }
+
+    .archive-card h3 {
+      position: relative;
+      z-index: 1;
+      margin: 0 0 0.55rem;
+      color: var(--cyan);
+      font-size: 0.95rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .archive-card p {
+      position: relative;
+      z-index: 1;
+      margin: 0 0 0.75rem;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 0.88rem;
+    }
+
+    .archive-links {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      gap: 0.42rem;
+    }
+
+    .archive-links a,
+    .archive-links .sample-note {
+      display: block;
+      border: 1px solid rgba(143, 255, 147, 0.16);
+      background: rgba(0, 0, 0, 0.32);
+      color: var(--fg);
+      padding: 0.45rem 0.52rem;
+      font-size: 0.78rem;
+    }
+
+    .preview {
+      position: relative;
+      z-index: 1;
+      margin-bottom: 0.7rem;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: #050505;
+      overflow: hidden;
+      min-height: 130px;
+    }
+
+    .preview img {
+      display: block;
+      width: 100%;
+      height: 170px;
+      object-fit: cover;
+      filter: saturate(1.25) contrast(1.12);
+    }
+
+    .preview.patch img {
+      height: 220px;
+      object-fit: contain;
+      background: #07070a;
+    }
+
+    .preview::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.1) 0 1px, transparent 1px 4px);
+      mix-blend-mode: screen;
+      opacity: 0.25;
+      pointer-events: none;
+    }
+
+    .audio-panel {
+      margin-top: 0.75rem;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 0.65rem;
+      align-items: center;
+    }
+
+    audio {
+      width: 100%;
+      min-width: 0;
+      filter: hue-rotate(82deg) saturate(1.4);
+    }
+
+    .arm-audio {
+      border: 1px solid rgba(255, 209, 102, 0.55);
+      background: rgba(255, 209, 102, 0.1);
+      color: var(--amber);
+      cursor: pointer;
+      padding: 0.56rem 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+    }
+
+    .arm-audio[aria-pressed="true"] {
+      color: #000;
+      background: var(--amber);
     }
 
     .ticker {
-      margin-top: 1.2rem;
-      border: 1px solid var(--line);
+      margin-top: 1rem;
       overflow: hidden;
-      background: rgba(255,255,255,0.03);
-      font-family: Consolas, "Courier New", monospace;
-      font-size: 0.82rem;
+      border: 1px solid rgba(255, 49, 95, 0.28);
+      background: rgba(0, 0, 0, 0.48);
       color: var(--muted);
-      clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+      clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
     }
 
     .ticker-line {
+      display: inline-block;
       white-space: nowrap;
-      padding: 0.6rem 0;
-      animation: marquee 28s linear infinite;
+      padding: 0.62rem 0;
+      animation: ticker 34s linear infinite;
     }
 
-    .card:nth-child(2) { transform: skewY(0.5deg) translateY(4px); }
-    .card:nth-child(3) { transform: skewY(-0.8deg) translateY(-2px); }
-
-    .glitch::selection,
-    .summary::selection,
-    .chip::selection {
-      background: #fff;
-      color: #000;
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.6rem 1rem;
+      margin-top: 1rem;
+      padding: 0.85rem;
+      color: var(--dim);
+      border: 1px dashed rgba(143, 255, 147, 0.24);
+      background: rgba(0, 0, 0, 0.4);
+      font-size: 0.8rem;
     }
 
-    @keyframes rgb-jitter {
-      0% { transform: translate(0,0); text-shadow: 9px 2px 0 #f00, -3px 3px 0 #0f0, 3px -3px 0 #00f; }
-      50% { transform: translate(1px,-1px); text-shadow: 4px 2px 0 #0f0, -3px 8px 0 #00f, 10px -2px 0 #f00; }
-      100% { transform: translate(-1px,1px); text-shadow: 3px 3px 0 #00f, -3px 3px 0 #f00, 3px -3px 0 #0f0; }
+    @keyframes static-slip {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(2px, -1px); }
     }
 
-    @keyframes slice-a {
-      0%,100% { transform: translate(2px,-1px); }
-      50% { transform: translate(-3px,1px); }
+    @keyframes diffusion-crawl {
+      0% { background-position: 0 0, 0 0; }
+      100% { background-position: var(--diffusion-cell) calc(var(--diffusion-cell) * -1), 0 0; }
     }
 
-    @keyframes slice-b {
-      0%,100% { transform: translate(-2px,1px); }
-      50% { transform: translate(3px,-1px); }
+    @keyframes tear-roll {
+      0%, 100% { transform: translate(0, 0); }
+      35% { transform: translate(calc((var(--tear) - 0.5) * 28px), 3px); }
+      70% { transform: translate(calc((0.5 - var(--tear)) * 16px), -2px); }
     }
 
-    @keyframes wobble {
-      0% { transform: translate(0,0) scale(1.005); }
-      100% { transform: translate(-3px,2px) scale(1.018); }
+    @keyframes boot-line {
+      0% { transform: translateY(-50%) scaleX(0.04); opacity: 0; }
+      22% { opacity: 1; }
+      100% { transform: translateY(-50%) scaleX(1.2); opacity: 0.9; }
     }
 
-    @keyframes drift {
-      0% { transform: translateX(-25%); }
-      100% { transform: translateX(25%); }
+    @keyframes boot-card-flicker {
+      0%, 100% { opacity: 1; transform: translate(0, 0); }
+      20% { opacity: 0.6; transform: translate(2px, -1px); }
+      40% { opacity: 0.95; transform: translate(-1px, 1px); }
+      60% { opacity: 0.7; transform: translate(3px, 0); }
     }
 
-    @keyframes marquee {
+    @keyframes boot-hide {
+      0%, 92% { opacity: 1; visibility: visible; }
+      100% { opacity: 0; visibility: hidden; }
+    }
+
+    @keyframes title-jitter {
+      0%, 100% { transform: translate(0, 0) skewX(0deg); }
+      34% { transform: translate(1px, -1px) skewX(-0.4deg); }
+      66% { transform: translate(-1px, 1px) skewX(0.5deg); }
+    }
+
+    @keyframes title-slice-a {
+      0%, 100% { transform: translate(calc(var(--rgb-shift) * 0.7), -1px); }
+      50% { transform: translate(calc(var(--rgb-shift) * -0.35), 2px); }
+    }
+
+    @keyframes title-slice-b {
+      0%, 100% { transform: translate(calc(var(--rgb-shift) * -0.65), 1px); }
+      50% { transform: translate(calc(var(--rgb-shift) * 0.42), -2px); }
+    }
+
+    @keyframes screen-roll {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(4px); }
+    }
+
+    @keyframes chroma-drift {
+      0% { transform: translateX(-3%); }
+      100% { transform: translateX(3%); }
+    }
+
+    @keyframes line-tear {
+      0%, 100% { transform: translate(0, 0); }
+      40% { transform: translate(9px, -2px); }
+      70% { transform: translate(-7px, 2px); }
+    }
+
+    @keyframes burst-scan {
+      0%, 100% { top: 16%; opacity: 0.15; }
+      30% { top: 42%; opacity: 0.45; }
+      60% { top: 68%; opacity: 0.25; }
+      80% { top: 82%; opacity: 0.38; }
+    }
+
+    @keyframes osd-jump {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(2px); }
+    }
+
+    @keyframes card-tear {
+      0%, 100% { top: 21%; opacity: 0.12; }
+      45% { top: 58%; opacity: 0.35; }
+      72% { top: 78%; opacity: 0.22; }
+    }
+
+    @keyframes ticker {
       0% { transform: translateX(0); }
       100% { transform: translateX(-50%); }
     }
 
-    @keyframes noise-shift {
-      0% { transform: translate(0,0); }
-      100% { transform: translate(1px,-1px); }
+    @media (max-width: 1040px) {
+      .hero {
+        grid-template-columns: 1fr;
+        min-height: auto;
+      }
+
+      .crt-panel {
+        min-height: auto;
+      }
+
+      .archive-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .fx-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
     }
 
-    @keyframes noise-drift {
-      0% { transform: translate(0,0); }
-      100% { transform: translate(-2px, 1px); }
+    @media (max-width: 680px) {
+      :root {
+        --rgb-shift: 3px;
+        --diffusion-cell: 12px;
+      }
+
+      .shell {
+        width: min(100vw - 0.7rem, 1240px);
+      }
+
+      .hero-copy {
+        padding: 1rem;
+      }
+
+      .glitch {
+        font-size: clamp(2.25rem, 15vw, 4.4rem);
+        overflow-wrap: anywhere;
+      }
+
+      .summary {
+        font-size: 0.9rem;
+      }
+
+      .crt-head,
+      .section-head,
+      .audio-panel {
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+
+      .section-head p {
+        text-align: left;
+      }
+
+      .screen {
+        min-height: 240px;
+        aspect-ratio: 4 / 5;
+      }
+
+      .screen-osd {
+        display: grid;
+      }
+
+      .osd-menu {
+        width: min(100%, 280px);
+      }
+
+      .quick-jump,
+      .archive-grid,
+      .fx-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .preview.patch img {
+        height: 185px;
+      }
     }
 
-    @keyframes datamosh-a {
-      0%, 85%, 100% { transform: translate(0,0); }
-      86% { transform: translate(8px, -3px); }
-      92% { transform: translate(-12px, 2px); }
-    }
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+      }
 
-    @keyframes datamosh-b {
-      0%, 88%, 100% { transform: translate(0,0); }
-      89% { transform: translate(-9px, 1px); }
-      94% { transform: translate(11px, -2px); }
-    }
+      .boot-overlay {
+        display: none;
+      }
 
-    @keyframes line-tear {
-      0%, 100% { top: 18%; opacity: 0.15; }
-      25% { top: 42%; opacity: 0.4; }
-      50% { top: 66%; opacity: 0.22; }
-      75% { top: 85%; opacity: 0.35; }
-    }
-
-    @keyframes phosphor-drift {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(12px); }
-    }
-
-    @keyframes warp-roll {
-      0% { transform: translate(-2%, -1%) rotate(-0.6deg) scale(1); }
-      100% { transform: translate(2%, 1%) rotate(0.6deg) scale(1.03); }
+      .diffusion-canvas {
+        opacity: 0.32;
+      }
     }
   </style>
 </head>
 <body>
-  <div id="shader" aria-hidden="true"></div>
+  <canvas id="diffusionCanvas" class="diffusion-canvas" aria-hidden="true"></canvas>
+  <div class="fallback-field" aria-hidden="true"></div>
+  <div class="phosphor-fog" aria-hidden="true"></div>
+  <div class="diffusion-mask" aria-hidden="true"></div>
   <div class="noise" aria-hidden="true"></div>
-  <div class="noise-heavy" aria-hidden="true"></div>
-  <div class="scan" aria-hidden="true"></div>
-  <div class="phosphor" aria-hidden="true"></div>
-  <div class="vhs-warp" aria-hidden="true"></div>
-  <div class="vignette-round" aria-hidden="true"></div>
+  <div class="vhs-tear" aria-hidden="true"></div>
 
-  <main class="page">
-    <section class="panel hero">
-      <p class="tagline">signal archive / max patch glitches / error diffusion fragments</p>
-      <h1 class="glitch" data-text="𝖊𝖗𝖗𝖔𝖗 𝖉𝖎𝖋𝖋𝖚𝖘𝖎𝖔𝖓">𝖊𝖗𝖗𝖔𝖗 𝖉𝖎𝖋𝖋𝖚𝖘𝖎𝖔𝖓</h1>
-      <p class="summary">
-        Rebuilt to remove broken links and 404 media. This page now uses local graphics only, with layered glitch effects,
-        shader background distortion, and Max patch visual treatments.
-      </p>
-      <div>
-        <span class="nameserver">darl.ns.cloudflare.com</span>
-        <span class="nameserver">elisabeth.ns.cloudflare.com</span>
+  <div class="boot-overlay" aria-hidden="true">
+    <div class="boot-card">
+      <strong>signal lock / error diffusion core</strong>
+      <span>loading max patch debris :: osc 4005 :: touchosc 8000 :: curtis 4020 :: jitter matrix online</span>
+    </div>
+  </div>
+
+  <main class="shell">
+    <section class="hero" id="top">
+      <div class="panel hero-copy">
+        <p class="sysline">CH-404.1 / network error as musical concept / creative-code signal archive</p>
+        <h1 class="glitch" data-text="𝖊𝖗𝖗𝖔𝖗 𝖉𝖎𝖋𝖋𝖚𝖘𝖎𝖔𝖓">𝖊𝖗𝖗𝖔𝖗 𝖉𝖎𝖋𝖋𝖚𝖘𝖎𝖔𝖓</h1>
+        <p class="summary">
+          Max/MSP TCP audio patches, OSC-controlled shader debris, gig scraps, sample fragments,
+          and error-diffusion visuals treated like a damaged transport graph. Hocket logic, packet loss,
+          datamosh strips, and hand-rolled browser shaders are patched into one loud archive interface.
+        </p>
+        <div class="signal-row" aria-label="system signals">
+          <span class="badge green">OSC 4005</span>
+          <span class="badge blue">INTERNAL 4000/4001</span>
+          <span class="badge hot">CURTIS 4020</span>
+          <span class="badge green">TOUCHOSC 8000</span>
+          <span class="badge">transport @tempo 90</span>
+        </div>
+        <div class="links" aria-label="primary links">
+          <a href="https://github.com/aday1/error-diffusion">GitHub source</a>
+          <a href="https://aday1.github.io/error-diffusion/">Pages backup</a>
+          <a href="#max-pack">Max pack</a>
+          <a href="#fx-bank">FX database</a>
+          <a href="#archive">public library</a>
+        </div>
+        <div class="lexicon" aria-label="Max patch lexicon">
+          <span class="chip">p audiostuff</span>
+          <span class="chip">p granular</span>
+          <span class="chip hot">release_time 120.</span>
+          <span class="chip">attack_time 1.2</span>
+          <span class="chip blue">jit.net.recv</span>
+          <span class="chip hot">jit.release~</span>
+          <span class="chip">route connected</span>
+          <span class="chip">record~ curtis 2</span>
+          <span class="chip green">metro 4n @active 1</span>
+          <span class="chip">buffer~ curtis</span>
+        </div>
       </div>
-      <div class="links">
-        <a href="https://github.com/aday1/error-diffusion">GitHub source</a>
-        <a href="https://aday1.github.io/error-diffusion/">GitHub Pages backup</a>
+
+      <aside class="panel crt-panel" aria-label="CRT media rig">
+        <div class="crt-head">
+          <span>AV-ERROR-DIFFUSION</span>
+          <span id="signalMeter">rgb split 05 / tear 40</span>
+        </div>
+        <div class="crt-frame">
+          <div class="screen" id="crtScreen">
+            <div class="media-stack" id="mediaStack" aria-live="polite">
+              <figure class="media-plane patch active" data-feed="0">
+                <img src="assets/max-patch-1.png" alt="Max/MSP patch screenshot for Error Diffusion">
+              </figure>
+              <figure class="media-plane" data-feed="1">
+                <img src="library/gig-scrap/error-defuse1.gif" alt="Error Defuse glitch scrap GIF A">
+              </figure>
+              <figure class="media-plane" data-feed="2">
+                <img src="library/gig-scrap/error-defuse2.gif" alt="Error Defuse glitch scrap GIF B">
+              </figure>
+              <figure class="media-plane poster" data-feed="3">
+                <img src="library/gig-posters/maggies-art-space-3200x360.png" alt="Maggie's Art Space wide gig poster strip">
+              </figure>
+            </div>
+            <div class="screen-burst" aria-hidden="true"></div>
+            <div class="screen-osd">
+              <div class="channel" id="channelLabel">CH-01 MAX PATCH</div>
+              <nav class="osd-menu" aria-label="media feed selector">
+                <header id="osdHeader">Surf // Max Patch</header>
+                <ul class="feed-list" id="feedList"></ul>
+                <footer>Menu: TAB / Tune: ENTER</footer>
+              </nav>
+            </div>
+          </div>
+        </div>
+        <p class="now-playing" id="nowPlaying">
+          now routing: max patch output through scanline comb, RGB offsets, diffusion grain, and transport drift.
+        </p>
+        <div class="quick-jump" aria-label="quick archive jumps">
+          <a href="library/docs/shader-rips.txt">shader rips txt</a>
+          <a href="library/docs/osc-addresses-max-umenu.csv">OSC fader CSV</a>
+          <a href="library/max-packs/error-diff-tcp/ediff_networkAudio.maxpat">networkAudio.maxpat</a>
+          <a href="library/max-packs/error-diff-tcp/easyTCPtest.maxpat">easyTCPtest.maxpat</a>
+        </div>
+      </aside>
+    </section>
+
+    <section class="section" id="fx-bank">
+      <div class="section-head">
+        <h2>Patch database FX bank</h2>
+        <p>Pointer and audio analyser values push the CSS variables that bend the canvas field, OSD glow, and RGB channel offsets.</p>
       </div>
-      <div class="lexicon" aria-label="Max patch lexicon">
-        <span class="chip">p audiostuff</span>
-        <span class="chip">p granular</span>
-        <span class="chip">release_time 120.</span>
-        <span class="chip">attack_time 1.2</span>
-        <span class="chip catch">jit.net.recv</span>
-        <span class="chip release">jit.release~</span>
-        <span class="chip">route connected</span>
-        <span class="chip">record-curtis</span>
-        <span class="chip metro">metro 4n @active 1</span>
-        <span class="chip">transport @tempo 90</span>
-        <span class="chip">buffer~ curtis</span>
-        <span class="chip">playmode $1</span>
+      <div class="panel matrix">
+        <div class="fx-grid" id="fxGrid" aria-label="reactive FX matrix"></div>
+        <div class="terminal" id="terminalLog">
+          <strong>ediff-router:</strong> waiting for fader drift :: /3/fader1..12 :: toggles armed :: packet loss aesthetic accepted
+        </div>
       </div>
     </section>
 
-    <section class="grid">
-      <article class="card">
-        <h2>Patch Signal A</h2>
-        <div class="shot glitch-a">
-          <img src="/assets/max-patch-1.png" alt="Max patch glitch preview A">
-        </div>
-        <p>Primary patch capture with RGB displacement and subtle zoom drift.</p>
-      </article>
-      <article class="card">
-        <h2>Patch Signal B</h2>
-        <div class="shot glitch-b">
-          <img src="/assets/max-patch-1.png" alt="Max patch glitch preview B">
-        </div>
-        <p>Scanline + chromatic haze overlay variant for hard-noise readability.</p>
-      </article>
-      <article class="card">
-        <h2>Patch Signal C</h2>
-        <div class="shot glitch-c">
-          <img src="/assets/max-patch-1.png" alt="Max patch glitch preview C">
-        </div>
-        <p>Deep-shift color map for night mode projection and ambient loop visuals.</p>
-      </article>
+    <section class="section" id="archive">
+      <div class="section-head">
+        <h2>Public archive routes</h2>
+        <p>Local files only for the core visuals. Patches, docs, samples, TouchOSC, and performance scraps stay directly reachable.</p>
+      </div>
+      <div class="archive-grid">
+        <article class="archive-card" id="max-pack">
+          <div class="preview patch">
+            <img src="assets/max-patch-1.png" alt="Max patch preview">
+          </div>
+          <h3>Max/MSP TCP audio pack</h3>
+          <p>Network audio sketches, limiter fragments, JACK routing notes, and TCP patch debris.</p>
+          <div class="archive-links">
+            <a href="library/max-packs/error-diff-tcp/README.md">README notes</a>
+            <a href="library/max-packs/error-diff-tcp/ediff_networkAudio.maxpat">ediff_networkAudio.maxpat</a>
+            <a href="library/max-packs/error-diff-tcp/easyTCPtest.maxpat">easyTCPtest.maxpat</a>
+          </div>
+        </article>
+
+        <article class="archive-card">
+          <h3>OSC map / shader faders</h3>
+          <p>TouchOSC faders and toggles for FX, colour, shift, scale, shader index, and bypass controls.</p>
+          <div class="archive-links">
+            <a href="library/docs/osc-addresses-max-umenu.csv">osc-addresses-max-umenu.csv</a>
+            <a href="library/docs/glsl-osc-messages.txt">glsl-osc-messages.txt</a>
+            <a href="library/performance/touchosc/Aday-2019-Resolume5-VJ.touchosc">TouchOSC layout</a>
+          </div>
+        </article>
+
+        <article class="archive-card">
+          <h3>Shader rips / tunnel notes</h3>
+          <p>Grid, orb, red warp, cyber tunnel, CRT green plasma, pentagram, hex plane, and plotting references.</p>
+          <div class="archive-links">
+            <a href="library/docs/shader-rips.txt">shader-rips.txt</a>
+            <a href="library/performance/toe/osc.toe">osc.toe fragment</a>
+            <a href="library/performance/tools/OSCMonitor.exe">OSCMonitor.exe</a>
+          </div>
+        </article>
+
+        <article class="archive-card">
+          <div class="preview">
+            <img src="library/gig-posters/maggies-art-space-3200x360.png" alt="Maggie's Art Space poster strip preview">
+          </div>
+          <h3>Gig poster strip</h3>
+          <p>Wide 3200x360 visual strip, staged as projection fascia and banner texture.</p>
+          <div class="archive-links">
+            <a href="library/gig-posters/maggies-art-space-3200x360.png">maggies-art-space-3200x360.png</a>
+          </div>
+        </article>
+
+        <article class="archive-card">
+          <div class="preview">
+            <img src="library/gig-scrap/error-defuse1.gif" alt="Error Defuse GIF preview A">
+          </div>
+          <h3>Gig scrap GIFs</h3>
+          <p>Compressed motion leftovers for hard-noise loops, channel surfing, and background abuse.</p>
+          <div class="archive-links">
+            <a href="library/gig-scrap/error-defuse1.gif">error-defuse1.gif</a>
+            <a href="library/gig-scrap/error-defuse2.gif">error-defuse2.gif</a>
+          </div>
+        </article>
+
+        <article class="archive-card">
+          <h3>Sample fragments</h3>
+          <p>Beat sketch plus space-console SFX. Audio starts only if you press play or arm the analyser.</p>
+          <div class="archive-links">
+            <a href="library/samples/beats/ADAY%20-%20RMX%20-%20beATS.mp3">ADAY - RMX - beATS.mp3</a>
+            <a href="library/samples/sfx/SPACEMODEM.wav">SPACEMODEM.wav</a>
+            <a href="library/samples/sfx/REDALERT.wav">REDALERT.wav</a>
+            <span class="sample-note">no autoplay / user-controlled bus</span>
+          </div>
+          <div class="audio-panel">
+            <audio id="audioBus" controls preload="none" src="library/samples/beats/ADAY%20-%20RMX%20-%20beATS.mp3"></audio>
+            <button class="arm-audio" id="armAudio" type="button" aria-pressed="false">arm bus</button>
+          </div>
+        </article>
+      </div>
     </section>
 
-    <section class="ticker">
+    <div class="ticker" aria-hidden="true">
       <div class="ticker-line">
-        p audiostuff :: p granular :: release_time 120. :: attack_time 1.2 :: jit.net.recv :: jit.release~ :: route connected :: record-curtis ::
-        metro 4n @active 1 :: transport @tempo 90 :: buffer~ curtis :: playmode $1 :: p audiostuff :: p granular :: release_time 120. ::
+        p audiostuff :: p granular :: network error as musical concept :: /3/fader1 FX FUN 1 :: /3/fader12 SCALE ::
+        jit.net.recv :: record~ curtis 2 :: release_time 120 :: attack_time 1.2 :: threshold 0.125 :: hocket ethos ::
+        shader OSC 4005 :: internal routing 4000/4001 :: TouchOSC 8000 :: Curtis OSC 4020 ::
+        p audiostuff :: p granular :: network error as musical concept :: /3/fader1 FX FUN 1 :: /3/fader12 SCALE ::
       </div>
-    </section>
+    </div>
+
+    <footer class="footer">
+      <span>errordiffusion.cc / errordiffusion.net</span>
+      <span>darl.ns.cloudflare.com :: elisabeth.ns.cloudflare.com</span>
+      <a href="#top">return to signal top</a>
+    </footer>
   </main>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/89/three.min.js"></script>
-  <script id="vertexShader" type="x-shader/x-vertex">
-    void main() {
-      gl_Position = vec4(position, 1.0);
-    }
-  </script>
-  <script id="fragmentShader" type="x-shader/x-fragment">
-    #ifdef GL_ES
-    precision mediump float;
-    #endif
-    #extension GL_OES_standard_derivatives : enable
-
-    uniform float time;
-    uniform vec2 resolution;
-    uniform vec2 mouse;
-
-    void main(void) {
-      vec2 fMosaicScal = vec2(1.4, 2.0);
-      vec2 vScreenSize = vec2(resolution.x, resolution.y);
-      vec4 o = gl_FragColor;
-      vec3 u = normalize(vec3(2.0 * gl_FragCoord.xy - resolution.xy, resolution.xy.x)) * 0.9;
-
-      u.x = floor(u.x * vScreenSize.x / fMosaicScal.x) / (vScreenSize.x / fMosaicScal.x);
-      u.y = floor(u.y * vScreenSize.y / fMosaicScal.y) / (vScreenSize.y / fMosaicScal.y);
-      u.z = floor(u.z * vScreenSize.y / fMosaicScal.y) / (vScreenSize.y / fMosaicScal.y);
-
-      for (float i = 0.0; i < 2.0; i++) {
-        u.y += abs(cos(u.y * i * 2.1) * 0.1);
-        u.z += abs(cos(u.x * u.y - time * 0.01));
-        u += abs(cos(u * i * 0.1) * 0.1);
-        o = max(o, abs(cos(3.0 * dot(u, u) + vec4(0.0))));
-      }
-      float mouseWarp = sin((u.x + mouse.x * 1.5) * 18.0 + time * 2.5) * 0.06;
-      o.rg += mouseWarp;
-      o.b += sin((u.y + mouse.y) * 14.0 - time * 1.7) * 0.04;
-      gl_FragColor = o;
-    }
-  </script>
   <script>
-    var jitHost = document.getElementById("shader");
-    var metroCamera = new THREE.Camera();
-    var signalScene = new THREE.Scene();
-    var jitRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    var patchUniforms = {
-      time: { type: "f", value: 3.0 },
-      resolution: { type: "v2", value: new THREE.Vector2() },
-      mouse: { type: "v2", value: new THREE.Vector2(0.5, 0.5) }
-    };
+    (() => {
+      const root = document.documentElement;
+      const canvas = document.getElementById("diffusionCanvas");
+      const ctx = canvas.getContext("2d", { alpha: true });
+      const reducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const coarsePointer = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+      const smallViewport = window.innerWidth < 700;
+      const performanceMode = reducedMotion || coarsePointer || smallViewport;
+      const dprLimit = performanceMode ? 1 : 1.35;
+      const state = {
+        pointerX: 0.5,
+        pointerY: 0.5,
+        hue: 0,
+        tear: 0.4,
+        pulse: 0.35,
+        audio: 0,
+        feed: 0,
+        lastFrame: 0
+      };
 
-    metroCamera.position.z = 2;
+      const feeds = [
+        {
+          label: "Max Patch",
+          channel: "CH-01 MAX PATCH",
+          summary: "now routing: max patch output through scanline comb, RGB offsets, diffusion grain, and transport drift."
+        },
+        {
+          label: "Error Defuse A",
+          channel: "CH-02 DEFUSE GIF A",
+          summary: "now routing: error-defuse1.gif through packet loss, animated debris, and VHS tear bars."
+        },
+        {
+          label: "Error Defuse B",
+          channel: "CH-03 DEFUSE GIF B",
+          summary: "now routing: error-defuse2.gif through chroma overdrive and bad-frame persistence."
+        },
+        {
+          label: "Maggie's Strip",
+          channel: "CH-04 POSTER STRIP",
+          summary: "now routing: 3200x360 gig strip as projection fascia, scanner smear, and banner memory."
+        },
+        {
+          label: "Shader Notes",
+          channel: "CH-05 GLSL NOTES",
+          summary: "now routing: grid tunnel, CRT green plasma, red warp, hex plane, and orb references from shader-rips.txt."
+        },
+        {
+          label: "OSC Map",
+          channel: "CH-06 OSC MAP",
+          summary: "now routing: /3/fader1..12 and /3/toggle1..7 into CSS variables and canvas diffusion cells."
+        }
+      ];
 
-    var patchGeometry = new THREE.PlaneBufferGeometry(4, 2);
-    var patchMaterial = new THREE.ShaderMaterial({
-      uniforms: patchUniforms,
-      vertexShader: document.getElementById("vertexShader").textContent,
-      fragmentShader: document.getElementById("fragmentShader").textContent
-    });
+      const fxEntries = [
+        { key: "/3/fader1", label: "FX FUN 1", target: "grain" },
+        { key: "/3/fader2", label: "FX FUN 2", target: "tear" },
+        { key: "/3/fader5", label: "COLOR CHANGE R", target: "hue" },
+        { key: "/3/fader8", label: "SHIFT X1", target: "rgb" },
+        { key: "/3/fader12", label: "SCALE", target: "cell" },
+        { key: "/3/toggle7", label: "BYPASS CURTIS MAXPATCH", target: "gate" },
+        { key: "jit.net.recv", label: "matrix receiver", target: "net" },
+        { key: "record~ curtis 2", label: "buffer capture", target: "rec" },
+        { key: "release_time 120", label: "limiter release", target: "release" },
+        { key: "threshold 0.125", label: "gain clamp", target: "limit" }
+      ];
 
-    signalScene.add(new THREE.Mesh(patchGeometry, patchMaterial));
-    jitRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    jitHost.appendChild(jitRenderer.domElement);
+      const mediaPlanes = Array.from(document.querySelectorAll(".media-plane"));
+      const feedList = document.getElementById("feedList");
+      const channelLabel = document.getElementById("channelLabel");
+      const osdHeader = document.getElementById("osdHeader");
+      const nowPlaying = document.getElementById("nowPlaying");
+      const signalMeter = document.getElementById("signalMeter");
+      const fxGrid = document.getElementById("fxGrid");
+      const terminalLog = document.getElementById("terminalLog");
+      const audio = document.getElementById("audioBus");
+      const armAudio = document.getElementById("armAudio");
+      let feedTimer = 0;
+      let audioContext = null;
+      let analyser = null;
+      let frequencyData = null;
 
-    function resize() {
-      jitRenderer.setSize(window.innerWidth, window.innerHeight);
-      patchUniforms.resolution.value.x = jitRenderer.domElement.width;
-      patchUniforms.resolution.value.y = jitRenderer.domElement.height;
-    }
+      function cssNumber(name, value, unit) {
+        root.style.setProperty(name, String(value) + (unit || ""));
+      }
 
-    function frame() {
-      patchUniforms.time.value += 0.01;
-      jitRenderer.render(signalScene, metroCamera);
-      requestAnimationFrame(frame);
-    }
+      function resizeCanvas() {
+        const dpr = Math.min(window.devicePixelRatio || 1, dprLimit);
+        const width = Math.max(1, Math.floor(window.innerWidth * dpr));
+        const height = Math.max(1, Math.floor(window.innerHeight * dpr));
+        if (canvas.width !== width || canvas.height !== height) {
+          canvas.width = width;
+          canvas.height = height;
+        }
+      }
 
-    function updateMouse(e) {
-      patchUniforms.mouse.value.x = e.clientX / window.innerWidth;
-      patchUniforms.mouse.value.y = 1.0 - (e.clientY / window.innerHeight);
-    }
+      function drawDiffusion(now) {
+        if (!ctx) return;
+        const frameGap = performanceMode ? 52 : 26;
+        if (now - state.lastFrame < frameGap) {
+          requestAnimationFrame(drawDiffusion);
+          return;
+        }
+        state.lastFrame = now;
+        resizeCanvas();
+        const width = canvas.width;
+        const height = canvas.height;
+        const t = now * 0.001;
+        const cell = performanceMode ? 18 : 11;
+        ctx.clearRect(0, 0, width, height);
+        const gradient = ctx.createRadialGradient(width * state.pointerX, height * state.pointerY, 0, width * 0.5, height * 0.5, Math.max(width, height) * 0.72);
+        gradient.addColorStop(0, `hsla(${320 + state.hue}, 92%, ${32 + state.audio * 20}%, 0.52)`);
+        gradient.addColorStop(0.34, `hsla(${168 + state.hue * 0.35}, 94%, 28%, 0.34)`);
+        gradient.addColorStop(0.72, `hsla(${205 + state.hue * 0.2}, 100%, 18%, 0.28)`);
+        gradient.addColorStop(1, "rgba(0, 0, 0, 0.04)");
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, width, height);
 
-    window.addEventListener("resize", resize, false);
-    window.addEventListener("pointermove", updateMouse, false);
-    resize();
-    frame();
+        const cols = Math.ceil(width / cell);
+        const rows = Math.ceil(height / cell);
+        for (let y = 0; y < rows; y += 1) {
+          for (let x = 0; x < cols; x += 1) {
+            const wave = Math.sin(x * 0.47 + t * 1.8) + Math.cos(y * 0.36 - t * 1.35);
+            const dist = Math.hypot((x / cols) - state.pointerX, (y / rows) - state.pointerY);
+            const threshold = 0.25 + state.audio * 0.22 + Math.sin(t + y * 0.2) * 0.09;
+            if (wave * 0.22 + 0.45 - dist > threshold) {
+              const alpha = Math.max(0.04, 0.16 - dist * 0.13 + state.audio * 0.14);
+              ctx.fillStyle = `hsla(${(x * 7 + y * 11 + state.hue) % 360}, 92%, 66%, ${alpha})`;
+              ctx.fillRect(x * cell + Math.sin(t + y) * 2, y * cell, Math.max(2, cell - 3), Math.max(2, cell - 3));
+            }
+          }
+        }
+
+        ctx.globalCompositeOperation = "screen";
+        for (let i = 0; i < 8; i += 1) {
+          const y = (Math.sin(t * (0.6 + i * 0.05) + i) * 0.5 + 0.5) * height;
+          const tear = (state.tear - 0.5) * width * 0.08;
+          ctx.fillStyle = i % 2 ? "rgba(255, 49, 95, 0.12)" : "rgba(110, 216, 255, 0.12)";
+          ctx.fillRect(tear - width * 0.05, y, width * 1.1, 2 + (i % 3));
+        }
+        ctx.globalCompositeOperation = "source-over";
+        requestAnimationFrame(drawDiffusion);
+      }
+
+      function setFeed(index, fromUser) {
+        state.feed = ((index % feeds.length) + feeds.length) % feeds.length;
+        const visualIndex = state.feed % mediaPlanes.length;
+        mediaPlanes.forEach((plane, idx) => {
+          plane.classList.toggle("active", idx === visualIndex);
+        });
+        const feed = feeds[state.feed];
+        channelLabel.textContent = feed.channel;
+        osdHeader.textContent = "Surf // " + feed.label;
+        nowPlaying.textContent = feed.summary;
+        Array.from(feedList.querySelectorAll("button")).forEach((button, idx) => {
+          button.classList.toggle("active", idx === state.feed);
+          button.setAttribute("aria-pressed", idx === state.feed ? "true" : "false");
+        });
+        if (fromUser) feedTimer = performance.now();
+      }
+
+      function renderFeedButtons() {
+        feeds.forEach((feed, idx) => {
+          const item = document.createElement("li");
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "feed-button";
+          button.textContent = String(idx + 1).padStart(2, "0") + " // " + feed.label;
+          button.setAttribute("aria-pressed", idx === 0 ? "true" : "false");
+          button.addEventListener("click", () => setFeed(idx, true));
+          button.addEventListener("keydown", (event) => {
+            if (event.key === "ArrowDown") {
+              event.preventDefault();
+              const next = feedList.querySelectorAll("button")[(idx + 1) % feeds.length];
+              next.focus();
+              setFeed(idx + 1, true);
+            }
+            if (event.key === "ArrowUp") {
+              event.preventDefault();
+              const next = feedList.querySelectorAll("button")[(idx - 1 + feeds.length) % feeds.length];
+              next.focus();
+              setFeed(idx - 1, true);
+            }
+          });
+          item.appendChild(button);
+          feedList.appendChild(item);
+        });
+      }
+
+      function renderFxGrid() {
+        fxEntries.forEach((entry, idx) => {
+          const cell = document.createElement("div");
+          cell.className = "fx-cell";
+          cell.dataset.index = String(idx);
+          cell.innerHTML = [
+            '<span class="fx-key"></span>',
+            '<span class="fx-label"></span>',
+            '<span class="fx-value"></span>'
+          ].join("");
+          cell.querySelector(".fx-key").textContent = entry.key;
+          cell.querySelector(".fx-label").textContent = entry.label;
+          cell.querySelector(".fx-value").textContent = "0.000";
+          fxGrid.appendChild(cell);
+        });
+      }
+
+      function updateFx(now) {
+        const t = now * 0.001;
+        state.pulse = Math.max(0.1, Math.min(1, 0.35 + state.audio * 0.8 + Math.sin(t * 1.7) * 0.08));
+        state.tear = Math.max(0, Math.min(1, state.pointerX * 0.7 + state.audio * 0.3));
+        state.hue = (state.pointerY * 150 + state.audio * 130 + t * 8) % 360;
+        const rgb = 3 + state.tear * 11 + state.audio * 8;
+        const cell = 6 + Math.round((1 - state.pointerY) * 14 + state.audio * 8);
+        cssNumber("--hue", state.hue.toFixed(2), "deg");
+        cssNumber("--tear", state.tear.toFixed(3), "");
+        cssNumber("--pulse", state.pulse.toFixed(3), "");
+        cssNumber("--rgb-shift", rgb.toFixed(2), "px");
+        cssNumber("--diffusion-cell", cell, "px");
+        signalMeter.textContent = "rgb split " + String(Math.round(rgb)).padStart(2, "0") + " / tear " + Math.round(state.tear * 99);
+
+        const activeIndex = Math.abs(Math.floor((t * 1.2 + state.pointerX * 10 + state.audio * 10))) % fxEntries.length;
+        Array.from(fxGrid.children).forEach((cellNode, idx) => {
+          const entry = fxEntries[idx];
+          const phase = (Math.sin(t * (0.6 + idx * 0.11) + idx + state.pointerX * 4) + 1) * 0.5;
+          const value = Math.max(0, Math.min(1, phase * 0.66 + state.audio * 0.34));
+          cellNode.classList.toggle("active", idx === activeIndex || value > 0.78);
+          cellNode.querySelector(".fx-value").textContent = value.toFixed(3) + " :: " + entry.target;
+        });
+        const activeEntry = fxEntries[activeIndex];
+        terminalLog.innerHTML = "<strong>ediff-router:</strong> " + activeEntry.key + " -> " + activeEntry.label + " :: hue " + Math.round(state.hue) + " :: scale cell " + cell + " :: audio " + state.audio.toFixed(3);
+
+        if (!reducedMotion && now - feedTimer > 6400) {
+          feedTimer = now;
+          setFeed(state.feed + 1, false);
+        }
+        requestAnimationFrame(updateFx);
+      }
+
+      function readAudioLevel() {
+        if (!analyser || !frequencyData) {
+          state.audio *= 0.94;
+          requestAnimationFrame(readAudioLevel);
+          return;
+        }
+        analyser.getByteFrequencyData(frequencyData);
+        let sum = 0;
+        for (let i = 0; i < frequencyData.length; i += 1) sum += frequencyData[i];
+        state.audio = Math.min(1, (sum / frequencyData.length) / 190);
+        requestAnimationFrame(readAudioLevel);
+      }
+
+      async function armAudioBus() {
+        try {
+          if (!audioContext) {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (!AudioCtx) return;
+            audioContext = new AudioCtx();
+            const source = audioContext.createMediaElementSource(audio);
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 128;
+            frequencyData = new Uint8Array(analyser.frequencyBinCount);
+            source.connect(analyser);
+            analyser.connect(audioContext.destination);
+          }
+          if (audioContext.state === "suspended") await audioContext.resume();
+          armAudio.setAttribute("aria-pressed", "true");
+          armAudio.textContent = "bus armed";
+          if (audio.paused) await audio.play();
+        } catch (error) {
+          armAudio.textContent = "bus blocked";
+        }
+      }
+
+      function updatePointer(event) {
+        if (event.clientX == null || event.clientY == null) return;
+        state.pointerX = Math.max(0, Math.min(1, event.clientX / Math.max(1, window.innerWidth)));
+        state.pointerY = Math.max(0, Math.min(1, event.clientY / Math.max(1, window.innerHeight)));
+      }
+
+      renderFeedButtons();
+      renderFxGrid();
+      setFeed(0, false);
+      resizeCanvas();
+      window.addEventListener("resize", resizeCanvas, { passive: true });
+      window.addEventListener("pointermove", updatePointer, { passive: true });
+      window.addEventListener("keydown", (event) => {
+        if (event.key === "ArrowRight" && event.altKey) setFeed(state.feed + 1, true);
+        if (event.key === "ArrowLeft" && event.altKey) setFeed(state.feed - 1, true);
+      });
+      armAudio.addEventListener("click", armAudioBus);
+      requestAnimationFrame(drawDiffusion);
+      requestAnimationFrame(updateFx);
+      requestAnimationFrame(readAudioLevel);
+    })();
   </script>
 </body>
 </html>

@@ -18,12 +18,20 @@ export default {
       return assetResponse;
     }
 
-    const crashPageRequest = new Request(new URL("/404.html", url).toString(), request);
+    const crashPageRequest = new Request(new URL("/404.html", url).toString(), {
+      method: "GET",
+      headers: request.headers
+    });
     const crashPageResponse = await env.ASSETS.fetch(crashPageRequest);
     if (crashPageResponse.ok) {
+      const headers = new Headers(crashPageResponse.headers);
+      if (!headers.has("content-type")) {
+        headers.set("content-type", "text/html; charset=utf-8");
+      }
+
       return new Response(crashPageResponse.body, {
         status: 404,
-        headers: crashPageResponse.headers
+        headers
       });
     }
 

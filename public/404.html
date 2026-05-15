@@ -4,182 +4,282 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>404 / signal lost</title>
-  <meta name="description" content="error diffusion crash page">
+  <meta name="description" content="Error Diffusion route missing crash page.">
+  <meta name="theme-color" content="#090007">
   <style>
     :root {
       color-scheme: dark;
-      --fg: #f2f2f2;
-      --line: rgba(255, 255, 255, 0.22);
-      --cyan: #8cf4ff;
-      --magenta: #ff47ca;
-      --lime: #b9ff7a;
-      --bg: #040404;
+      --bg: #050005;
+      --fg: #e8fff0;
+      --muted: #9cc8a8;
+      --line: rgba(143, 255, 147, 0.28);
+      --red: #ff315f;
+      --green: #8fff93;
+      --cyan: #8cf6ff;
+      --magenta: #ff4fbd;
+      --amber: #ffd166;
+      --font: Consolas, "Lucida Console", "Courier New", monospace;
     }
+
     * { box-sizing: border-box; }
-    html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--fg); }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background: #000;
+      color: var(--fg);
+    }
+
     body {
       overflow: hidden;
-      font-family: "Audiowide", "Segoe UI", Tahoma, sans-serif;
+      font-family: var(--font);
+      background:
+        radial-gradient(circle at 18% 15%, rgba(255, 49, 95, 0.22), transparent 34rem),
+        radial-gradient(circle at 84% 80%, rgba(140, 246, 255, 0.16), transparent 32rem),
+        linear-gradient(180deg, #120006, #030003 58%, #000);
+      text-shadow: 0 0 7px rgba(143, 255, 147, 0.22);
     }
 
-    .crt {
-      position: fixed;
-      inset: 0;
-      background: radial-gradient(circle at center, rgba(24,24,24,0.8), #000 70%);
-      transform-origin: center center;
-      animation: crt-twist 18s ease-in-out infinite alternate;
-    }
-
-    .scan {
+    body::before,
+    body::after,
+    .noise,
+    .tear {
+      content: "";
       position: fixed;
       inset: 0;
       pointer-events: none;
-      background-image: linear-gradient(to bottom, rgba(255,255,255,0.05), rgba(255,255,255,0.02) 1px, transparent 1px, transparent 4px);
-      background-size: 100% 4px;
+    }
+
+    body::before {
+      z-index: 2;
+      background:
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.08) 0 1px, rgba(0, 0, 0, 0.42) 1px 3px, transparent 3px 5px),
+        repeating-linear-gradient(90deg, rgba(255, 0, 0, 0.08) 0 1px, rgba(0, 255, 80, 0.06) 1px 2px, rgba(0, 140, 255, 0.07) 2px 3px, transparent 3px 7px);
+      opacity: 0.82;
       mix-blend-mode: screen;
-      opacity: 0.22;
+    }
+
+    body::after {
+      z-index: 2;
+      background: radial-gradient(circle at center, transparent 38%, rgba(0, 0, 0, 0.5) 72%, rgba(0, 0, 0, 0.92) 100%);
     }
 
     .noise {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      opacity: 0.1;
-      background-image: radial-gradient(circle, rgba(255,255,255,0.35) 0.8px, transparent 0.8px);
-      background-size: 6px 6px;
-      animation: noise-shift 0.16s steps(2) infinite;
+      z-index: 1;
+      opacity: 0.2;
+      mix-blend-mode: screen;
+      background-image:
+        radial-gradient(circle, rgba(255, 255, 255, 0.9) 0 0.8px, transparent 0.85px),
+        radial-gradient(circle, rgba(143, 255, 147, 0.7) 0 0.7px, transparent 0.75px);
+      background-size: 3px 3px, 5px 5px;
+      animation: static-slip 140ms steps(2, end) infinite;
     }
 
-    .vignette {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      box-shadow: inset 0 0 140px rgba(0, 0, 0, 0.9);
+    .tear {
+      z-index: 3;
+      opacity: 0.45;
+      background:
+        linear-gradient(180deg, transparent 0 18%, rgba(255, 255, 255, 0.18) 18.4%, rgba(255, 49, 95, 0.13) 19%, transparent 20% 58%, rgba(140, 246, 255, 0.15) 58.3%, transparent 59%),
+        repeating-linear-gradient(0deg, transparent 0 33px, rgba(255, 255, 255, 0.09) 34px, transparent 35px 64px);
+      mix-blend-mode: screen;
+      animation: tear-roll 3.2s steps(4, end) infinite;
     }
 
     .wrap {
       position: relative;
-      z-index: 2;
+      z-index: 5;
       min-height: 100svh;
       display: grid;
       place-items: center;
-      padding: 1.2rem;
+      padding: 1rem;
     }
 
     .panel {
-      width: min(780px, calc(100vw - 2rem));
+      width: min(860px, calc(100vw - 1.4rem));
       border: 1px solid var(--line);
-      border-radius: 18px;
-      background: rgba(7, 7, 7, 0.72);
-      backdrop-filter: blur(5px);
-      padding: clamp(1rem, 3vw, 2rem);
-      transform: perspective(1000px) rotateX(1.8deg);
-      animation: power-flicker 2.8s steps(2) infinite;
+      background:
+        radial-gradient(circle at 12% 14%, rgba(255, 49, 95, 0.15), transparent 38%),
+        radial-gradient(circle at 90% 22%, rgba(140, 246, 255, 0.1), transparent 30%),
+        linear-gradient(180deg, rgba(17, 2, 10, 0.94), rgba(0, 0, 0, 0.82));
+      box-shadow:
+        0 26px 90px rgba(0, 0, 0, 0.72),
+        inset 0 0 42px rgba(143, 255, 147, 0.07);
+      clip-path: polygon(0 0, calc(100% - 26px) 0, 100% 26px, 100% 100%, 26px 100%, 0 calc(100% - 26px));
+      padding: clamp(1rem, 4vw, 2rem);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(90deg, rgba(255, 49, 95, 0.08), transparent 20%, transparent 80%, rgba(140, 246, 255, 0.1)),
+        repeating-linear-gradient(0deg, transparent 0 18px, rgba(255, 255, 255, 0.04) 19px, transparent 20px 37px);
+      mix-blend-mode: screen;
+    }
+
+    .sysline {
+      position: relative;
+      z-index: 1;
+      margin: 0 0 0.65rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      font-size: 0.78rem;
     }
 
     .code {
+      position: relative;
+      z-index: 1;
       margin: 0;
-      font-size: clamp(2.8rem, 15vw, 8rem);
-      line-height: 0.9;
-      text-transform: uppercase;
-      letter-spacing: 0.09em;
       color: #fff;
-      text-shadow: 4px 4px 0 #f00, -4px 4px 0 #0f0, 4px -4px 0 #00f;
-      animation: rgb-jitter 700ms ease-in-out infinite alternate;
+      font-size: clamp(4.6rem, 20vw, 12rem);
+      line-height: 0.86;
+      letter-spacing: 0.08em;
+      text-shadow:
+        9px 2px 0 rgba(255, 49, 95, 0.86),
+        -5px 4px 0 rgba(143, 255, 147, 0.74),
+        3px -3px 0 rgba(140, 246, 255, 0.82),
+        0 0 28px rgba(255, 255, 255, 0.14);
+      animation: code-jitter 680ms steps(2, end) infinite;
     }
 
-    .msg {
-      margin: 0.8rem 0 0;
-      font-family: Consolas, "Courier New", monospace;
+    .copy {
+      position: relative;
+      z-index: 1;
+      max-width: 68ch;
+      margin: 0.9rem 0 0;
+      color: var(--fg);
       line-height: 1.6;
-      color: rgba(218, 221, 230, 0.9);
+      border-left: 3px solid var(--green);
+      background: rgba(0, 0, 0, 0.46);
+      padding: 0.76rem 0.9rem;
     }
 
-    .chips {
-      margin-top: 1rem;
+    .chips,
+    .links {
+      position: relative;
+      z-index: 1;
       display: flex;
       flex-wrap: wrap;
       gap: 0.5rem;
+      margin-top: 0.9rem;
     }
 
-    .chip {
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      padding: 0.3rem 0.62rem;
-      font-family: Consolas, "Courier New", monospace;
-      font-size: 0.75rem;
-      background: rgba(255,255,255,0.03);
-      color: rgba(236, 236, 236, 0.9);
-    }
-    .chip.cyan { color: var(--cyan); border-color: rgba(140,244,255,0.35); }
-    .chip.magenta { color: var(--magenta); border-color: rgba(255,71,202,0.35); }
-    .chip.lime { color: var(--lime); border-color: rgba(185,255,122,0.35); }
-
-    .links {
-      margin-top: 1.1rem;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.6rem;
-    }
+    .chip,
     .links a {
-      text-decoration: none;
       border: 1px solid var(--line);
-      border-radius: 999px;
-      padding: 0.48rem 0.9rem;
-      color: var(--fg);
+      background: rgba(0, 0, 0, 0.38);
+      color: var(--muted);
+      padding: 0.38rem 0.62rem;
       font-size: 0.78rem;
-      letter-spacing: 0.1em;
+      clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+    }
+
+    .chip.green { color: var(--green); border-color: rgba(143, 255, 147, 0.45); }
+    .chip.hot { color: var(--magenta); border-color: rgba(255, 79, 189, 0.42); }
+    .chip.blue { color: var(--cyan); border-color: rgba(140, 246, 255, 0.42); }
+
+    .links a {
+      color: var(--fg);
+      text-decoration: none;
       text-transform: uppercase;
-      background: rgba(255,255,255,0.03);
+      letter-spacing: 0.08em;
     }
 
-    @keyframes rgb-jitter {
-      0% { transform: translate(0,0); text-shadow: 9px 2px 0 #f00, -3px 3px 0 #0f0, 3px -3px 0 #00f; }
-      50% { transform: translate(1px,-1px); text-shadow: 4px 2px 0 #0f0, -3px 8px 0 #00f, 10px -2px 0 #f00; }
-      100% { transform: translate(-1px,1px); text-shadow: 3px 3px 0 #00f, -3px 3px 0 #f00, 3px -3px 0 #0f0; }
+    .links a:hover,
+    .links a:focus-visible {
+      color: #fff;
+      border-color: var(--cyan);
+      text-shadow: 0 0 14px currentColor;
+      outline: 2px solid var(--amber);
+      outline-offset: 3px;
     }
 
-    @keyframes crt-twist {
-      0% { transform: scale(1) rotateZ(-0.35deg); }
-      50% { transform: scale(1.012) rotateZ(0.25deg); }
-      100% { transform: scale(0.996) rotateZ(-0.18deg); }
+    .trace {
+      position: relative;
+      z-index: 1;
+      margin-top: 1rem;
+      border: 1px solid rgba(140, 246, 255, 0.22);
+      background: rgba(0, 0, 0, 0.52);
+      padding: 0.65rem;
+      color: var(--muted);
+      font-size: 0.8rem;
+      line-height: 1.55;
     }
 
-    @keyframes power-flicker {
-      0%, 100% { opacity: 1; }
-      10% { opacity: 0.95; }
-      20% { opacity: 0.88; }
-      30% { opacity: 1; }
-      65% { opacity: 0.92; }
-      78% { opacity: 1; }
+    .trace strong {
+      color: var(--green);
+      font-weight: 400;
     }
 
-    @keyframes noise-shift {
-      0% { transform: translate(0,0); }
-      100% { transform: translate(1px,-1px); }
+    @keyframes static-slip {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(2px, -1px); }
+    }
+
+    @keyframes tear-roll {
+      0%, 100% { transform: translate(0, 0); }
+      40% { transform: translate(12px, 3px); }
+      70% { transform: translate(-9px, -2px); }
+    }
+
+    @keyframes code-jitter {
+      0%, 100% { transform: translate(0, 0) skewX(0deg); }
+      35% { transform: translate(2px, -1px) skewX(-0.7deg); }
+      70% { transform: translate(-2px, 1px) skewX(0.6deg); }
+    }
+
+    @media (max-width: 620px) {
+      .panel {
+        padding: 1rem;
+      }
+
+      .sysline {
+        font-size: 0.68rem;
+      }
+
+      .code {
+        font-size: clamp(3.5rem, 28vw, 6rem);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="crt" aria-hidden="true"></div>
-  <div class="scan" aria-hidden="true"></div>
   <div class="noise" aria-hidden="true"></div>
-  <div class="vignette" aria-hidden="true"></div>
+  <div class="tear" aria-hidden="true"></div>
 
   <main class="wrap">
     <section class="panel">
+      <p class="sysline">CH-00 / route missing / worker returned crash page</p>
       <h1 class="code">404</h1>
-      <p class="msg">signal lost / patch route missing / crash page online</p>
-      <p class="msg">jit.net.recv timed out on this path. return to root and re-enter the transport graph.</p>
-      <div class="chips" aria-label="max patch terms">
-        <span class="chip cyan">p audiostuff</span>
-        <span class="chip cyan">p granular</span>
-        <span class="chip">route connected</span>
-        <span class="chip">record-curtis</span>
-        <span class="chip lime">metro 4n @active 1</span>
+      <p class="copy">
+        signal lost. jit.net.recv timed out, route connected: 0, and buffer~ curtis is unavailable on this path.
+        Re-enter the root transport graph or inspect the public archive from a known route.
+      </p>
+      <div class="chips" aria-label="missing route diagnostics">
+        <span class="chip blue">jit.net.recv timeout</span>
+        <span class="chip hot">route connected: 0</span>
+        <span class="chip">buffer~ curtis unavailable</span>
+        <span class="chip green">OSC 4005 idle</span>
         <span class="chip">transport @tempo 90</span>
-        <span class="chip magenta">jit.release~</span>
-        <span class="chip">buffer~ curtis</span>
+        <span class="chip hot">packet loss aesthetic accepted</span>
+      </div>
+      <div class="trace">
+        <strong>ediff-worker:</strong> asset lookup failed :: serving 404.html :: no merge into signal bus :: retry root channel
       </div>
       <div class="links">
         <a href="/">go home</a>
