@@ -57,7 +57,7 @@
       background:
         linear-gradient(to bottom, rgba(255, 255, 255, 0.08) 0 1px, rgba(0, 0, 0, 0.42) 1px 3px, transparent 3px 5px),
         repeating-linear-gradient(90deg, rgba(255, 0, 0, 0.08) 0 1px, rgba(0, 255, 80, 0.06) 1px 2px, rgba(0, 140, 255, 0.07) 2px 3px, transparent 3px 7px);
-      opacity: 0.82;
+      opacity: 0.34;
       mix-blend-mode: screen;
     }
 
@@ -68,23 +68,23 @@
 
     .noise {
       z-index: 1;
-      opacity: 0.2;
+      opacity: 0.055;
       mix-blend-mode: screen;
       background-image:
         radial-gradient(circle, rgba(255, 255, 255, 0.9) 0 0.8px, transparent 0.85px),
         radial-gradient(circle, rgba(143, 255, 147, 0.7) 0 0.7px, transparent 0.75px);
-      background-size: 3px 3px, 5px 5px;
-      animation: static-slip 140ms steps(2, end) infinite;
+      background-size: 5px 5px, 8px 8px;
+      animation: none;
     }
 
     .tear {
       z-index: 3;
-      opacity: 0.45;
+      opacity: 0.12;
       background:
         linear-gradient(180deg, transparent 0 18%, rgba(255, 255, 255, 0.18) 18.4%, rgba(255, 49, 95, 0.13) 19%, transparent 20% 58%, rgba(140, 246, 255, 0.15) 58.3%, transparent 59%),
         repeating-linear-gradient(0deg, transparent 0 33px, rgba(255, 255, 255, 0.09) 34px, transparent 35px 64px);
       mix-blend-mode: screen;
-      animation: tear-roll 3.2s steps(4, end) infinite;
+      animation: none;
     }
 
     .wrap {
@@ -146,7 +146,7 @@
         -5px 4px 0 rgba(143, 255, 147, 0.74),
         3px -3px 0 rgba(140, 246, 255, 0.82),
         0 0 28px rgba(255, 255, 255, 0.14);
-      animation: code-jitter 680ms steps(2, end) infinite;
+      animation: none;
     }
 
     .copy {

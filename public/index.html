@@ -26,11 +26,11 @@
       --cyan: #8cf6ff;
       --magenta: #ff4fbd;
       --amber: #ffd166;
-      --rgb-shift: 5px;
-      --tear: 0.4;
+      --rgb-shift: 2.5px;
+      --tear: 0.18;
       --diffusion-cell: 9px;
       --hue: 0deg;
-      --pulse: 0.35;
+      --pulse: 0.22;
       --font: Consolas, "Lucida Console", "Courier New", monospace;
       --display: "Audiowide", "Segoe UI", Tahoma, sans-serif;
     }
@@ -70,7 +70,7 @@
       background:
         linear-gradient(to bottom, rgba(255, 255, 255, 0.08) 0 1px, rgba(0, 0, 0, 0.42) 1px 3px, transparent 3px 5px),
         repeating-linear-gradient(90deg, rgba(255, 0, 0, 0.08) 0 1px, rgba(0, 255, 80, 0.06) 1px 2px, rgba(0, 140, 255, 0.07) 2px 3px, transparent 3px 7px);
-      opacity: 0.76;
+      opacity: 0.38;
       mix-blend-mode: screen;
     }
 
@@ -108,8 +108,8 @@
       z-index: 0;
       width: 100%;
       height: 100%;
-      opacity: 0.72;
-      filter: hue-rotate(var(--hue)) saturate(1.28) contrast(1.08);
+      opacity: 0.54;
+      filter: hue-rotate(var(--hue)) saturate(1.06) contrast(1.04);
       pointer-events: none;
     }
 
@@ -122,7 +122,7 @@
         repeating-conic-gradient(from 90deg at 50% 50%, rgba(255, 49, 95, 0.12) 0 8deg, transparent 8deg 18deg, rgba(110, 216, 255, 0.11) 18deg 23deg, transparent 23deg 42deg),
         radial-gradient(circle at 50% 48%, rgba(143, 255, 147, 0.2), transparent 35%),
         #030004;
-      opacity: 0.58;
+      opacity: 0.34;
       filter: blur(0.3px);
     }
 
@@ -138,40 +138,40 @@
 
     .noise {
       z-index: 2;
-      opacity: 0.18;
+      opacity: 0.055;
       mix-blend-mode: screen;
       background-image:
         radial-gradient(circle, rgba(255, 255, 255, 0.9) 0 0.8px, transparent 0.85px),
         radial-gradient(circle, rgba(143, 255, 147, 0.75) 0 0.7px, transparent 0.75px);
-      background-size: 3px 3px, 5px 5px;
-      animation: static-slip 180ms steps(2, end) infinite;
+      background-size: 5px 5px, 8px 8px;
+      animation: none;
     }
 
     .diffusion-mask {
       z-index: 1;
-      opacity: 0.18;
+      opacity: 0.1;
       background:
         radial-gradient(circle, rgba(255, 255, 255, 0.22) 0 1px, transparent 1px),
         linear-gradient(135deg, rgba(255, 49, 95, 0.12), transparent 35%, rgba(110, 216, 255, 0.12));
       background-size: var(--diffusion-cell) var(--diffusion-cell), 100% 100%;
       mix-blend-mode: screen;
-      animation: diffusion-crawl 900ms steps(4, end) infinite;
+      animation: diffusion-crawl 18s linear infinite;
     }
 
     .vhs-tear {
       z-index: 4;
-      opacity: calc(0.22 + var(--tear) * 0.24);
+      opacity: calc(0.06 + var(--tear) * 0.07);
       background:
         linear-gradient(180deg, transparent 0 18%, rgba(255, 255, 255, 0.18) 18.4%, rgba(255, 49, 95, 0.13) 19%, transparent 20% 41%, rgba(110, 216, 255, 0.16) 41.2%, transparent 42% 72%, rgba(255, 255, 255, 0.1) 72.3%, transparent 73%),
         repeating-linear-gradient(0deg, transparent 0 37px, rgba(255, 255, 255, 0.08) 38px, transparent 39px 64px);
       mix-blend-mode: screen;
-      transform: translateX(calc((var(--tear) - 0.5) * 18px));
-      animation: tear-roll 4.8s steps(4, end) infinite;
+      transform: translateX(calc((var(--tear) - 0.5) * 6px));
+      animation: tear-roll 22s linear infinite;
     }
 
     .phosphor-fog {
       z-index: 1;
-      opacity: 0.48;
+      opacity: 0.26;
       mix-blend-mode: screen;
       background:
         radial-gradient(circle at calc(20% + var(--pulse) * 30%) 22%, rgba(255, 49, 95, 0.18), transparent 28rem),
@@ -182,7 +182,7 @@
 
     .boot-overlay {
       z-index: 20;
-      display: grid;
+      display: none;
       place-items: center;
       background: radial-gradient(circle at 50% 50%, rgba(23, 0, 10, 0.98), #000 72%);
       color: var(--green);
@@ -318,7 +318,7 @@
         2px -2px 0 rgba(110, 216, 255, 0.82),
         0 0 28px rgba(255, 255, 255, 0.16);
       filter: contrast(1.18);
-      animation: title-jitter 700ms steps(2, end) infinite;
+      animation: none;
     }
 
     .glitch::before,
@@ -327,21 +327,21 @@
       position: absolute;
       inset: 0;
       pointer-events: none;
-      opacity: 0.7;
+      opacity: 0.34;
     }
 
     .glitch::before {
       color: var(--magenta);
       transform: translate(calc(var(--rgb-shift) * 0.7), -1px);
       clip-path: polygon(0 6%, 100% 2%, 100% 24%, 0 31%, 0 58%, 100% 52%, 100% 63%, 0 69%);
-      animation: title-slice-a 1.35s steps(2, end) infinite;
+      animation: none;
     }
 
     .glitch::after {
       color: var(--cyan);
       transform: translate(calc(var(--rgb-shift) * -0.65), 1px);
       clip-path: polygon(0 35%, 100% 31%, 100% 45%, 0 51%, 0 74%, 100% 70%, 100% 93%, 0 99%);
-      animation: title-slice-b 1.1s steps(2, end) infinite;
+      animation: none;
     }
 
     .summary {
@@ -466,8 +466,8 @@
         repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.11) 0 1px, rgba(0, 0, 0, 0.35) 1px 3px, transparent 3px 5px),
         linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 12%, transparent 84%, rgba(0, 0, 0, 0.32));
       mix-blend-mode: screen;
-      opacity: 0.82;
-      animation: screen-roll 2.1s steps(4, end) infinite;
+      opacity: 0.24;
+      animation: none;
     }
 
     .screen::after {
@@ -476,7 +476,7 @@
         radial-gradient(circle at 76% 74%, rgba(110, 216, 255, 0.2), transparent 42%),
         radial-gradient(circle at center, transparent 40%, rgba(0, 0, 0, 0.7) 100%);
       mix-blend-mode: screen;
-      opacity: 0.85;
+      opacity: 0.42;
     }
 
     .media-stack,
@@ -491,7 +491,7 @@
     .media-plane {
       opacity: 0;
       transform: scale(1.03);
-      transition: opacity 320ms steps(2, end), transform 420ms ease;
+      transition: opacity 520ms ease, transform 620ms ease;
     }
 
     .media-plane.active {
@@ -528,8 +528,8 @@
     .media-plane::before {
       background: linear-gradient(90deg, rgba(255, 49, 95, 0.2), transparent 42%, rgba(110, 216, 255, 0.18));
       mix-blend-mode: screen;
-      transform: translateX(calc((var(--tear) - 0.5) * 20px));
-      animation: chroma-drift 2.8s linear infinite alternate;
+      transform: translateX(calc((var(--tear) - 0.5) * 6px));
+      animation: chroma-drift 18s ease-in-out infinite alternate;
     }
 
     .media-plane::after {
@@ -537,8 +537,8 @@
         linear-gradient(180deg, transparent 0 24%, rgba(255, 255, 255, 0.18) 24.4%, rgba(255, 49, 95, 0.14) 25.2%, transparent 26% 61%, rgba(110, 216, 255, 0.15) 61.5%, transparent 63%),
         repeating-linear-gradient(0deg, transparent 0 21px, rgba(255, 255, 255, 0.07) 22px, transparent 24px);
       mix-blend-mode: screen;
-      opacity: 0.72;
-      animation: line-tear 1.6s steps(3, end) infinite;
+      opacity: 0.24;
+      animation: none;
     }
 
     .screen-burst {
@@ -550,9 +550,9 @@
       height: 7px;
       background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9), rgba(143, 255, 147, 0.58), transparent);
       box-shadow: 0 0 18px rgba(143, 255, 147, 0.7);
-      opacity: calc(0.16 + var(--tear) * 0.4);
-      transform: translateY(calc((var(--tear) - 0.5) * 90px));
-      animation: burst-scan 3.4s steps(5, end) infinite;
+      opacity: 0;
+      transform: translateY(calc((var(--tear) - 0.5) * 24px));
+      animation: none;
     }
 
     .screen-osd {
@@ -629,7 +629,7 @@
       background: rgba(143, 255, 147, 0.18);
       border-left-color: var(--green);
       color: #fff;
-      animation: osd-jump 1.2s steps(2, end) infinite;
+      animation: none;
     }
 
     .now-playing {
@@ -804,7 +804,7 @@
       height: 2px;
       background: rgba(255, 255, 255, 0.22);
       opacity: 0.2;
-      animation: card-tear 2.6s steps(3, end) infinite;
+      animation: none;
     }
 
     .archive-card h3 {
@@ -1129,13 +1129,6 @@
   <div class="noise" aria-hidden="true"></div>
   <div class="vhs-tear" aria-hidden="true"></div>
 
-  <div class="boot-overlay" aria-hidden="true">
-    <div class="boot-card">
-      <strong>signal lock / error diffusion core</strong>
-      <span>loading max patch debris :: osc 4005 :: touchosc 8000 :: curtis 4020 :: jitter matrix online</span>
-    </div>
-  </div>
-
   <main class="shell">
     <section class="hero" id="top">
       <div class="panel hero-copy">
@@ -1174,10 +1167,10 @@
         </div>
       </div>
 
-      <aside class="panel crt-panel" aria-label="CRT media rig">
+      <aside class="panel crt-panel" aria-label="visual media rig">
         <div class="crt-head">
-          <span>AV-ERROR-DIFFUSION</span>
-          <span id="signalMeter">rgb split 05 / tear 40</span>
+          <span>MATRIX-ERROR-DIFFUSION</span>
+          <span id="signalMeter">rgb split 03 / drift 18</span>
         </div>
         <div class="crt-frame">
           <div class="screen" id="crtScreen">
@@ -1197,17 +1190,17 @@
             </div>
             <div class="screen-burst" aria-hidden="true"></div>
             <div class="screen-osd">
-              <div class="channel" id="channelLabel">CH-01 MAX PATCH</div>
+              <div class="channel" id="channelLabel">LAYER 01 MAX PATCH</div>
               <nav class="osd-menu" aria-label="media feed selector">
-                <header id="osdHeader">Surf // Max Patch</header>
+                <header id="osdHeader">Layer // Max Patch</header>
                 <ul class="feed-list" id="feedList"></ul>
-                <footer>Menu: TAB / Tune: ENTER</footer>
+                <footer>Keys: TAB / ENTER</footer>
               </nav>
             </div>
           </div>
         </div>
         <p class="now-playing" id="nowPlaying">
-          now routing: max patch output through scanline comb, RGB offsets, diffusion grain, and transport drift.
+          now routing: max patch output through RGB offsets, diffusion grain, and transport drift.
         </p>
         <div class="quick-jump" aria-label="quick archive jumps">
           <a href="library/docs/shader-rips.txt">shader rips txt</a>
@@ -1221,7 +1214,7 @@
     <section class="section" id="fx-bank">
       <div class="section-head">
         <h2>Patch database FX bank</h2>
-        <p>Pointer and audio analyser values push the CSS variables that bend the canvas field, OSD glow, and RGB channel offsets.</p>
+        <p>Pointer and audio analyser values push the CSS variables that bend the canvas field, panel glow, and RGB channel offsets.</p>
       </div>
       <div class="panel matrix">
         <div class="fx-grid" id="fxGrid" aria-label="reactive FX matrix"></div>
@@ -1340,8 +1333,8 @@
         pointerX: 0.5,
         pointerY: 0.5,
         hue: 0,
-        tear: 0.4,
-        pulse: 0.35,
+        tear: 0.18,
+        pulse: 0.22,
         audio: 0,
         feed: 0,
         lastFrame: 0
@@ -1350,39 +1343,39 @@
       const feeds = [
         {
           label: "Max Patch",
-          channel: "CH-01 MAX PATCH",
-          summary: "now routing: max patch output through scanline comb, RGB offsets, diffusion grain, and transport drift."
+          channel: "LAYER 01 MAX PATCH",
+          summary: "now routing: max patch output through restrained RGB offsets, diffusion grain, and transport drift."
         },
         {
           label: "Error Defuse A",
-          channel: "CH-02 DEFUSE GIF A",
-          summary: "now routing: error-defuse1.gif through packet loss, animated debris, and VHS tear bars."
+          channel: "LAYER 02 DEFUSE GIF A",
+          summary: "now routing: error-defuse1.gif through packet loss, animated debris, and low-rate displacement."
         },
         {
           label: "Error Defuse B",
-          channel: "CH-03 DEFUSE GIF B",
+          channel: "LAYER 03 DEFUSE GIF B",
           summary: "now routing: error-defuse2.gif through chroma overdrive and bad-frame persistence."
         },
         {
           label: "Maggie's Strip",
-          channel: "CH-04 POSTER STRIP",
+          channel: "LAYER 04 POSTER STRIP",
           summary: "now routing: 3200x360 gig strip as projection fascia, scanner smear, and banner memory."
         },
         {
           label: "Shader Notes",
-          channel: "CH-05 GLSL NOTES",
-          summary: "now routing: grid tunnel, CRT green plasma, red warp, hex plane, and orb references from shader-rips.txt."
+          channel: "LAYER 05 GLSL NOTES",
+          summary: "now routing: grid tunnel, green plasma, red warp, hex plane, and orb references from shader-rips.txt."
         },
         {
           label: "OSC Map",
-          channel: "CH-06 OSC MAP",
+          channel: "LAYER 06 OSC MAP",
           summary: "now routing: /3/fader1..12 and /3/toggle1..7 into CSS variables and canvas diffusion cells."
         }
       ];
 
       const fxEntries = [
         { key: "/3/fader1", label: "FX FUN 1", target: "grain" },
-        { key: "/3/fader2", label: "FX FUN 2", target: "tear" },
+        { key: "/3/fader2", label: "FX FUN 2", target: "drift" },
         { key: "/3/fader5", label: "COLOR CHANGE R", target: "hue" },
         { key: "/3/fader8", label: "SHIFT X1", target: "rgb" },
         { key: "/3/fader12", label: "SCALE", target: "cell" },
@@ -1424,7 +1417,7 @@
 
       function drawDiffusion(now) {
         if (!ctx) return;
-        const frameGap = performanceMode ? 52 : 26;
+        const frameGap = performanceMode ? 90 : 48;
         if (now - state.lastFrame < frameGap) {
           requestAnimationFrame(drawDiffusion);
           return;
@@ -1437,9 +1430,9 @@
         const cell = performanceMode ? 18 : 11;
         ctx.clearRect(0, 0, width, height);
         const gradient = ctx.createRadialGradient(width * state.pointerX, height * state.pointerY, 0, width * 0.5, height * 0.5, Math.max(width, height) * 0.72);
-        gradient.addColorStop(0, `hsla(${320 + state.hue}, 92%, ${32 + state.audio * 20}%, 0.52)`);
-        gradient.addColorStop(0.34, `hsla(${168 + state.hue * 0.35}, 94%, 28%, 0.34)`);
-        gradient.addColorStop(0.72, `hsla(${205 + state.hue * 0.2}, 100%, 18%, 0.28)`);
+        gradient.addColorStop(0, `hsla(${320 + state.hue}, 88%, ${28 + state.audio * 14}%, 0.36)`);
+        gradient.addColorStop(0.34, `hsla(${168 + state.hue * 0.35}, 88%, 24%, 0.24)`);
+        gradient.addColorStop(0.72, `hsla(${205 + state.hue * 0.2}, 92%, 16%, 0.18)`);
         gradient.addColorStop(1, "rgba(0, 0, 0, 0.04)");
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, width, height);
@@ -1460,11 +1453,11 @@
         }
 
         ctx.globalCompositeOperation = "screen";
-        for (let i = 0; i < 8; i += 1) {
+        for (let i = 0; i < 4; i += 1) {
           const y = (Math.sin(t * (0.6 + i * 0.05) + i) * 0.5 + 0.5) * height;
-          const tear = (state.tear - 0.5) * width * 0.08;
-          ctx.fillStyle = i % 2 ? "rgba(255, 49, 95, 0.12)" : "rgba(110, 216, 255, 0.12)";
-          ctx.fillRect(tear - width * 0.05, y, width * 1.1, 2 + (i % 3));
+          const drift = (state.tear - 0.5) * width * 0.025;
+          ctx.fillStyle = i % 2 ? "rgba(255, 49, 95, 0.055)" : "rgba(110, 216, 255, 0.055)";
+          ctx.fillRect(drift - width * 0.02, y, width * 1.04, 1);
         }
         ctx.globalCompositeOperation = "source-over";
         requestAnimationFrame(drawDiffusion);
@@ -1478,7 +1471,7 @@
         });
         const feed = feeds[state.feed];
         channelLabel.textContent = feed.channel;
-        osdHeader.textContent = "Surf // " + feed.label;
+        osdHeader.textContent = "Layer // " + feed.label;
         nowPlaying.textContent = feed.summary;
         Array.from(feedList.querySelectorAll("button")).forEach((button, idx) => {
           button.classList.toggle("active", idx === state.feed);
@@ -1534,17 +1527,18 @@
 
       function updateFx(now) {
         const t = now * 0.001;
-        state.pulse = Math.max(0.1, Math.min(1, 0.35 + state.audio * 0.8 + Math.sin(t * 1.7) * 0.08));
-        state.tear = Math.max(0, Math.min(1, state.pointerX * 0.7 + state.audio * 0.3));
-        state.hue = (state.pointerY * 150 + state.audio * 130 + t * 8) % 360;
-        const rgb = 3 + state.tear * 11 + state.audio * 8;
+        state.pulse = Math.max(0.08, Math.min(0.46, 0.18 + state.audio * 0.3 + Math.sin(t * 0.5) * 0.025));
+        const targetTear = Math.max(0.08, Math.min(0.38, state.pointerX * 0.22 + state.audio * 0.16 + 0.08));
+        state.tear += (targetTear - state.tear) * 0.08;
+        state.hue = (state.pointerY * 90 + state.audio * 70 + t * 2.5) % 360;
+        const rgb = 2 + state.tear * 5 + state.audio * 4;
         const cell = 6 + Math.round((1 - state.pointerY) * 14 + state.audio * 8);
         cssNumber("--hue", state.hue.toFixed(2), "deg");
         cssNumber("--tear", state.tear.toFixed(3), "");
         cssNumber("--pulse", state.pulse.toFixed(3), "");
         cssNumber("--rgb-shift", rgb.toFixed(2), "px");
         cssNumber("--diffusion-cell", cell, "px");
-        signalMeter.textContent = "rgb split " + String(Math.round(rgb)).padStart(2, "0") + " / tear " + Math.round(state.tear * 99);
+        signalMeter.textContent = "rgb split " + String(Math.round(rgb)).padStart(2, "0") + " / drift " + Math.round(state.tear * 99);
 
         const activeIndex = Math.abs(Math.floor((t * 1.2 + state.pointerX * 10 + state.audio * 10))) % fxEntries.length;
         Array.from(fxGrid.children).forEach((cellNode, idx) => {
@@ -1557,10 +1551,6 @@
         const activeEntry = fxEntries[activeIndex];
         terminalLog.innerHTML = "<strong>ediff-router:</strong> " + activeEntry.key + " -> " + activeEntry.label + " :: hue " + Math.round(state.hue) + " :: scale cell " + cell + " :: audio " + state.audio.toFixed(3);
 
-        if (!reducedMotion && now - feedTimer > 6400) {
-          feedTimer = now;
-          setFeed(state.feed + 1, false);
-        }
         requestAnimationFrame(updateFx);
       }
 
