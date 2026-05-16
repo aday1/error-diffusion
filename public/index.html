@@ -1739,27 +1739,28 @@
           return String(iso);
         }
       }
-      function age(iso) {
+      function age(iso, kind) {
         if (!iso) return "";
+        var tag = kind === "deploy" ? "deploy" : "build";
         var t = new Date(iso).getTime();
         if (Number.isNaN(t)) return "";
         var sec = Math.round((Date.now() - t) / 1000);
         if (sec < -120) return "";
-        if (sec < 45) return "just now";
-        if (sec < 3600) return Math.round(sec / 60) + " min ago";
-        if (sec < 86400) return Math.round(sec / 3600) + " h ago";
-        if (sec < 604800) return Math.round(sec / 86400) + " d ago";
-        if (sec < 4233600) return Math.round(sec / 604800) + " wk ago";
+        if (sec < 45) return "now";
+        if (sec < 3600) return Math.round(sec / 60) + "m since " + tag;
+        if (sec < 86400) return Math.round(sec / 3600) + "h since " + tag;
+        if (sec < 604800) return Math.round(sec / 86400) + "d since " + tag;
+        if (sec < 4233600) return Math.round(sec / 604800) + "wk since " + tag;
         var mo = Math.round(sec / (30.4375 * 86400));
-        if (mo < 24) return mo + " mo ago";
-        return Math.round(sec / (365.2425 * 86400)) + " yr ago";
+        if (mo < 24) return mo + "mo since " + tag;
+        return Math.round(sec / (365.2425 * 86400)) + "yr since " + tag;
       }
       function render(m) {
         var shaRaw = m.last_git_sha_short || m.version || "?";
         var buildIso = m.last_build_at || m.build_date || "";
         var depIso = m.last_deployed_at || m.last_build_at || m.build_date || "";
-        var ageB = age(buildIso);
-        var ageD = age(depIso);
+        var ageB = age(buildIso, "build");
+        var ageD = age(depIso, "deploy");
         var siteLab = (m.site ? String(m.site) : "").toUpperCase().replace(/\s+/g, "") || "SITE";
         var sumParts = [siteLab, String(shaRaw)];
         if (ageB) sumParts.push(ageB);
@@ -1782,10 +1783,10 @@
         var localTz = tzName();
         if (localTz) html += "<div style=\"opacity:.78;margin:0 0 4px;font-size:10px\"><strong>Your timezone:</strong> " + esc(localTz) + "</div>";
         html += "<div style=\"margin:4px 0\"><strong>Last build (CI):</strong> " + esc(fmt(buildIso));
-        if (ageB) html += " <span style=\"opacity:.82\"><strong>Age:</strong> " + esc(ageB) + "</span>";
+        if (ageB) html += " <span style=\"opacity:.82\">" + esc(ageB) + "</span>";
         html += "</div>";
         html += "<div style=\"margin:4px 0\"><strong>Last deployed (CI push):</strong> " + esc(fmt(depIso));
-        if (ageD) html += " <span style=\"opacity:.82\"><strong>Age:</strong> " + esc(ageD) + "</span>";
+        if (ageD) html += " <span style=\"opacity:.82\">" + esc(ageD) + "</span>";
         if (run) html += " <a href=\"" + esc(run) + "\" target=\"_blank\" rel=\"noopener noreferrer\">workflow</a>";
         html += "</div>";
         var links = [];
