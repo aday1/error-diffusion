@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>𝖊𝖗𝖗𝖔𝖗 𝖉𝖎𝖋𝖋𝖚𝖘𝖎𝖔𝖓</title>
+  <title>error diffusion</title>
   <meta name="description" content="Error Diffusion Max/MSP archive, OSC shader notes, glitch scraps, and reactive creative-code signal debris.">
   <meta name="theme-color" content="#1a1611">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
@@ -1263,13 +1263,13 @@
   <div class="phosphor-fog" aria-hidden="true"></div>
   <div class="diffusion-mask" aria-hidden="true"></div>
   <div class="noise" aria-hidden="true"></div>
-  <div class="vhs-tear" aria-hidden="true"></div>
+  <div id="ediffGrain" aria-hidden="true"></div>
 
   <main class="shell">
     <section class="hero" id="top">
       <div class="panel hero-copy">
         <p class="sysline">punched-tape telemetry / quantized debris / OSC shader notebook</p>
-        <h1 class="hero-title ediff-heading glitch" data-text="𝖊𝖗𝖗𝖔𝖗 𝖉𝖎𝖋𝖋𝖚𝖘𝖎𝖔𝖓" aria-label="error diffusion">𝖊𝖗𝖗𝖔𝖗 𝖉𝖎𝖋𝖋𝖚𝖘𝖎𝖔𝖓</h1>
+        <h1 class="hero-title ediff-heading glitch" data-plain="error diffusion" aria-label="error diffusion">error diffusion</h1>
         <p class="summary">
           Max/MSP TCP audio patches, OSC-controlled shader debris, gig scraps, sample fragments,
           and error-diffusion visuals treated like a damaged transport graph. Hocket logic, packet loss,
@@ -1539,9 +1539,11 @@
   </main>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js"></script>
+  <script src="https://unpkg.com/splitting@1.0.6/dist/splitting.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/grained@0.0.2/grained.min.js"></script>
+  <script src="scripts/vfx/ediff-glyphs.js"></script>
   <script>
     (function () {
-      var GLYPHS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz/~@#*+=?";
       var SOURCE =
         "congestion collapse :: transmission control protocol :: horse bazaar av :: p audiostuff :: p granular :: " +
         "network error as musical concept :: /3/fader1 fx fun 1 :: jit.net.recv :: record~ curtis 2 :: " +
@@ -1600,34 +1602,9 @@
       }
 
       function scrambleChip(chip) {
-        if (!hasAnime || reducedMotion) return;
-        var finalText = chip.getAttribute("data-plain") || chip.textContent;
-        var len = finalText.length;
-        var ticks = Math.max(10, Math.min(28, len + 14));
-        var obj = { t: 0 };
-        anime({
-          targets: obj,
-          t: ticks,
-          duration: 760,
-          easing: "easeOutQuad",
-          update: function () {
-            var show = Math.min(len, Math.floor((obj.t / ticks) * len));
-            var out = "";
-            for (var i = 0; i < len; i += 1) {
-              var ch = finalText.charAt(i);
-              if (ch === " ") {
-                out += " ";
-              } else if (i < show) {
-                out += ch;
-              } else {
-                out += GLYPHS.charAt(Math.floor(Math.random() * GLYPHS.length));
-              }
-            }
-            chip.textContent = out;
-          },
-          complete: function () {
-            chip.textContent = finalText;
-          }
+        if (!hasAnime || reducedMotion || !window.EdiffGlyphs) return;
+        window.EdiffGlyphs.animateScramble(chip, {
+          plain: chip.getAttribute("data-plain") || chip.textContent
         });
       }
 
@@ -1699,6 +1676,8 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/89/three.min.js"></script>
   <script src="scripts/vfx/ediff-type.js"></script>
+  <script src="scripts/vfx/text-scramble.js"></script>
+  <script src="scripts/vfx/split-chrome.js"></script>
   <script src="scripts/vfx/mosh-core.js"></script>
   <script src="scripts/vfx/mosh-strip-tear.js"></script>
   <script src="scripts/vfx/mosh-macroblock.js"></script>

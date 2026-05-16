@@ -554,7 +554,7 @@
       global.EdiffType.scanHeadings(document);
     }
     var nodes = document.querySelectorAll(
-      ".section-head h2, .media-card h3, .archive-card h3, .boot-card strong, .hero-title"
+      ".section-head h2, .media-card h3, .archive-card h3, .hero-title"
     );
     nodes.forEach(function (el) {
       if (!el.classList.contains("anime-wait")) {
@@ -654,6 +654,12 @@
 
   function boot() {
     initHeadings();
+    if (global.EdiffTextScramble && global.EdiffTextScramble.initHeadings) {
+      global.EdiffTextScramble.initHeadings(document);
+    }
+    if (global.EdiffSplitChrome && global.EdiffSplitChrome.boot) {
+      global.EdiffSplitChrome.boot();
+    }
     initThemeUi();
     initBoot();
     initWebGL();

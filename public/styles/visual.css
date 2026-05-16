@@ -257,6 +257,28 @@
   opacity: 0;
 }
 
+/* Splitting.js (terminal / boot chrome) */
+#terminalLog strong .char,
+.boot-card strong .char {
+  display: inline-block;
+  animation: ed-char-flicker 3.2s ease-in-out infinite;
+  animation-delay: calc(var(--char-index, 0) * 45ms);
+}
+
+@keyframes ed-char-flicker {
+  0%, 88%, 100% { opacity: 1; transform: translate(0, 0); }
+  90% { opacity: 0.55; transform: translate(1px, 0); }
+  94% { opacity: 0.9; transform: translate(-1px, 0); }
+}
+
+#ediffGrain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 4;
+  opacity: 0.35;
+}
+
 .svg-filters {
   position: absolute;
   width: 0;
