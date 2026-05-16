@@ -1317,6 +1317,7 @@
       <span>darl.ns.cloudflare.com :: elisabeth.ns.cloudflare.com</span>
       <a href="#top">return to signal top</a>
     </footer>
+    <div id="deployMetaBadge" style="position:fixed;right:8px;bottom:8px;z-index:9999;padding:4px 8px;border:1px solid #4cff8a;background:rgba(0,0,0,0.78);color:#b8ffd1;font:11px/1.2 monospace;max-width:85vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">deploy metadata loading...</div>
   </main>
 
   <script>
@@ -1609,6 +1610,23 @@
       requestAnimationFrame(drawDiffusion);
       requestAnimationFrame(updateFx);
       requestAnimationFrame(readAudioLevel);
+    })();
+  </script>
+  <script>
+    (function () {
+      var badge = document.getElementById("deployMetaBadge");
+      if (!badge) return;
+      fetch("./deploy-meta.json", { cache: "no-store" })
+        .then(function (r) { return r.ok ? r.json() : Promise.reject(new Error("missing")); })
+        .then(function (m) {
+          var dt = m.build_date ? new Date(m.build_date).toLocaleString() : "unknown-date";
+          var track = m.track || m.branch || "unknown-track";
+          var version = m.version || "unknown-version";
+          badge.textContent = track + " | " + version + " | " + dt;
+        })
+        .catch(function () {
+          badge.textContent = "deploy metadata unavailable";
+        });
     })();
   </script>
 </body>
