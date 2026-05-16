@@ -28,6 +28,16 @@ jobs:
             "track": "${GITHUB_REF_NAME}",
             "version": "${SHORT_SHA}",
             "build_date": "${BUILD_DATE}",
+            "last_git_sha_short": "${SHORT_SHA}",
+            "last_git_sha": "${GITHUB_SHA}",
+            "last_git_url": "https://github.com/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}",
+            "last_build_at": "${BUILD_DATE}",
+            "last_deployed_at": "${BUILD_DATE}",
+            "changelog_url": "https://github.com/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}",
+            "commits_history_url": "https://github.com/${GITHUB_REPOSITORY}/commits/${GITHUB_REF_NAME}",
+            "changelog_md_url": "https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_REF_NAME}/CHANGELOG.md",
+            "releases_url": "https://github.com/${GITHUB_REPOSITORY}/releases",
+            "workflow_run_url": "https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}",
             "run_id": "${GITHUB_RUN_ID}",
             "run_number": "${GITHUB_RUN_NUMBER}"
           }
