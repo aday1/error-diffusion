@@ -23,7 +23,7 @@ jobs:
           BUILD_DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           cat > public/deploy-meta.json <<EOF
           {
-            "site": "errordiffusion.cc",
+            "site": "errordiffusion.cc / errordiffusion.net",
             "branch": "${GITHUB_REF_NAME}",
             "track": "${GITHUB_REF_NAME}",
             "version": "${SHORT_SHA}",

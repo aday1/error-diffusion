@@ -23,6 +23,15 @@ The site keeps the original glitch/shader landing-page aesthetic and expands it 
 The visual/theme is based on:
 https://codepen.io/aday_net_au/pen/zYqdeEG
 
+Visual stack (WebGL shader + 2D diffusion canvas + theme presets) lives in:
+
+- `public/styles/visual.css`
+- `public/scripts/visual-stack.js`
+
+Themes: archive (default), rgb, cga, copper, paper. Press `T` to cycle; choice persists in `localStorage`.
+
+This repo is the only deploy source for `errordiffusion.cc` and `errordiffusion.net`. The separate `errordiffusion-cc` repository is deprecated.
+
 ## Repository layout
 
 Top level is intentionally minimal now:

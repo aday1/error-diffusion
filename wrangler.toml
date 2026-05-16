@@ -7,3 +7,6 @@ account_id = "98b823762cb6be14fb4fb00c935fadf1"
 directory = "./public"
 binding = "ASSETS"
 run_worker_first = true
+
+# Custom domains (errordiffusion.cc / .net) are attached in Cloudflare dashboard.
+# Route blocks omitted here so deploy token only needs Workers Scripts + Assets.

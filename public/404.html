@@ -1,12 +1,13 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="archive">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>404 / signal lost</title>
   <meta name="description" content="Error Diffusion route missing crash page.">
-  <meta name="theme-color" content="#090007">
+  <meta name="theme-color" content="#1a1611">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="styles/visual.css">
   <style>
     :root {
       color-scheme: dark;
@@ -20,6 +21,7 @@
       --magenta: #ff4fbd;
       --amber: #ffd166;
       --font: Consolas, "Lucida Console", "Courier New", monospace;
+      --display: "Newsreader", Georgia, serif;
     }
 
     * { box-sizing: border-box; }
@@ -267,6 +269,7 @@
     <section class="panel">
       <p class="sysline">CH-00 / route missing / worker returned crash page</p>
       <h1 class="code">404</h1>
+      <h2 class="ediff-heading" data-plain="signal lost">signal lost</h2>
       <p class="copy">
         signal lost. jit.net.recv timed out, route connected: 0, and buffer~ curtis is unavailable on this path.
         Re-enter the root transport graph or inspect the public archive from a known route.
@@ -288,5 +291,9 @@
       </div>
     </section>
   </main>
+  <script src="scripts/vfx/ediff-type.js"></script>
+  <script>
+    if (window.EdiffType) window.EdiffType.scanHeadings(document);
+  </script>
 </body>
 </html>
