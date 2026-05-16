@@ -1319,9 +1319,24 @@
     </footer>
   </main>
 
-  <div id="deployMetaPanel" style="position:fixed;right:10px;bottom:10px;z-index:9999;max-width:min(400px,calc(100vw - 20px));font:11px/1.45 ui-monospace,Consolas,monospace;border:1px solid #4cff8a;background:rgba(0,0,0,.92);color:#b8ffd1;padding:10px 12px;box-sizing:border-box;border-radius:3px;box-shadow:0 4px 18px rgba(0,0,0,.55);">
-    <div id="deployMetaTitle" style="font-weight:700;color:#fff;margin:0 0 6px;padding-bottom:4px;border-bottom:1px solid rgba(76,255,138,.35);letter-spacing:.06em;text-transform:uppercase;">build info</div>
-    <div id="deployMetaBody">Loading deploy metadata...</div>
+  <div id="deployMetaDock" style="position:fixed;right:10px;bottom:10px;z-index:9999;max-width:min(420px,calc(100vw - 20px));font:11px/1.45 ui-monospace,Consolas,monospace;">
+    <div id="deployMetaRestore" hidden style="margin-bottom:6px;text-align:right;">
+      <button type="button" id="deployMetaShowBtn" style="font:inherit;cursor:pointer;padding:4px 10px;border:1px solid #4cff8a;background:rgba(0,0,0,.88);color:#b8ffd1;border-radius:3px;box-shadow:0 2px 10px rgba(0,0,0,.45);">build info</button>
+    </div>
+    <div id="deployMetaPanel" role="region" aria-label="Build metadata" style="border:1px solid #4cff8a;background:rgba(0,0,0,.92);color:#b8ffd1;box-sizing:border-box;border-radius:3px;box-shadow:0 4px 18px rgba(0,0,0,.55);">
+      <div id="deployMetaBar" tabindex="0" role="button" aria-expanded="false" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 8px;cursor:pointer;user-select:none;">
+        <span id="deployMetaSummary" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Loading...</span>
+        <span id="deployMetaExpandGlyph" style="opacity:.85;flex-shrink:0;font-weight:700;">[+]</span>
+        <button type="button" id="deployMetaHideBtn" style="flex-shrink:0;font:inherit;cursor:pointer;padding:2px 6px;margin:0;border:1px solid rgba(76,255,138,.55);background:transparent;color:#b8ffd1;border-radius:2px;">hide</button>
+      </div>
+      <div id="deployMetaDetail" hidden style="padding:0 12px 10px;">
+        <div id="deployMetaTitle" style="font-weight:700;color:#fff;margin:0 0 6px;padding-bottom:4px;border-bottom:1px solid rgba(76,255,138,.35);letter-spacing:.06em;text-transform:uppercase;">build info</div>
+        <div id="deployMetaBody">Loading deploy metadata...</div>
+        <div style="margin-top:8px;">
+          <button type="button" id="deployMetaCollapseBtn" style="font:inherit;cursor:pointer;padding:3px 8px;border:1px solid rgba(76,255,138,.55);background:transparent;color:#b8ffd1;border-radius:2px;">collapse</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -1619,8 +1634,84 @@
   <script>
     (function () {
       var META_URL = "./deploy-meta.json";
+      var LS_KEY = "deployMetaDock:" + (typeof location !== "undefined" ? location.hostname : "");
       var bodyEl = document.getElementById("deployMetaBody");
-      if (!bodyEl) return;
+      var panel = document.getElementById("deployMetaPanel");
+      var dock = document.getElementById("deployMetaDock");
+      var bar = document.getElementById("deployMetaBar");
+      var summaryEl = document.getElementById("deployMetaSummary");
+      var detailEl = document.getElementById("deployMetaDetail");
+      var expandGlyph = document.getElementById("deployMetaExpandGlyph");
+      var hideBtn = document.getElementById("deployMetaHideBtn");
+      var collapseBtn = document.getElementById("deployMetaCollapseBtn");
+      var restoreWrap = document.getElementById("deployMetaRestore");
+      var showBtn = document.getElementById("deployMetaShowBtn");
+      if (!bodyEl || !panel || !dock || !bar || !summaryEl || !detailEl || !expandGlyph || !hideBtn || !collapseBtn || !restoreWrap || !showBtn) return;
+      function uiLoad() {
+        try {
+          var v = localStorage.getItem(LS_KEY);
+          if (v === "hidden") return "hidden";
+          if (v === "expanded") return "expanded";
+        } catch (eU) {}
+        return "collapsed";
+      }
+      function uiSave(mode) {
+        try { localStorage.setItem(LS_KEY, mode); } catch (eS) {}
+      }
+      function syncUi(mode) {
+        if (mode === "hidden") {
+          restoreWrap.hidden = false;
+          panel.hidden = true;
+        } else {
+          restoreWrap.hidden = true;
+          panel.hidden = false;
+          if (mode === "expanded") {
+            detailEl.hidden = false;
+            bar.setAttribute("aria-expanded", "true");
+            expandGlyph.textContent = "[-]";
+          } else {
+            detailEl.hidden = true;
+            bar.setAttribute("aria-expanded", "false");
+            expandGlyph.textContent = "[+]";
+          }
+        }
+      }
+      function expand() {
+        uiSave("expanded");
+        syncUi("expanded");
+      }
+      function collapse() {
+        uiSave("collapsed");
+        syncUi("collapsed");
+      }
+      function hideDock() {
+        uiSave("hidden");
+        syncUi("hidden");
+      }
+      function showDock() {
+        uiSave("collapsed");
+        syncUi("collapsed");
+      }
+      bar.addEventListener("click", function (ev) {
+        if (ev.target && ev.target.closest && ev.target.closest("#deployMetaHideBtn")) return;
+        if (detailEl.hidden) expand(); else collapse();
+      });
+      bar.addEventListener("keydown", function (ev) {
+        if (ev.key !== "Enter" && ev.key !== " ") return;
+        if (ev.target && ev.target.closest && ev.target.closest("#deployMetaHideBtn")) return;
+        ev.preventDefault();
+        if (detailEl.hidden) expand(); else collapse();
+      });
+      hideBtn.addEventListener("click", function (ev) {
+        ev.stopPropagation();
+        hideDock();
+      });
+      collapseBtn.addEventListener("click", function (ev) {
+        ev.stopPropagation();
+        collapse();
+      });
+      showBtn.addEventListener("click", showDock);
+      syncUi(uiLoad());
       function esc(s) {
         return String(s === null || s === undefined ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
       }
@@ -1664,10 +1755,17 @@
         return Math.round(sec / (365.2425 * 86400)) + " yr ago";
       }
       function render(m) {
-        var sha = esc(m.last_git_sha_short || m.version || "?");
-        var gitHref = esc(m.last_git_url || m.changelog_url || "#");
+        var shaRaw = m.last_git_sha_short || m.version || "?";
         var buildIso = m.last_build_at || m.build_date || "";
         var depIso = m.last_deployed_at || m.last_build_at || m.build_date || "";
+        var ageB = age(buildIso);
+        var ageD = age(depIso);
+        var siteLab = (m.site ? String(m.site) : "").toUpperCase().replace(/\s+/g, "") || "SITE";
+        var sumParts = [siteLab, String(shaRaw)];
+        if (ageB) sumParts.push(ageB);
+        summaryEl.textContent = sumParts.join(" | ");
+        var sha = esc(shaRaw);
+        var gitHref = esc(m.last_git_url || m.changelog_url || "#");
         var ch = m.changelog_url || "";
         var hist = m.commits_history_url || "";
         var md = m.changelog_md_url || "";
@@ -1681,8 +1779,6 @@
         html += "<div style=\"margin:4px 0\"><strong>Last git:</strong> <a href=\"" + gitHref + "\" target=\"_blank\" rel=\"noopener noreferrer\">" + sha + "</a>";
         if (branch) html += " <span style=\"opacity:.75\">(" + branch + ")</span>";
         html += "</div>";
-        var ageB = age(buildIso);
-        var ageD = age(depIso);
         var localTz = tzName();
         if (localTz) html += "<div style=\"opacity:.78;margin:0 0 4px;font-size:10px\"><strong>Your timezone:</strong> " + esc(localTz) + "</div>";
         html += "<div style=\"margin:4px 0\"><strong>Last build (CI):</strong> " + esc(fmt(buildIso));
@@ -1708,6 +1804,7 @@
         .then(render)
         .catch(function () {
           bodyEl.textContent = "Deploy metadata unavailable.";
+          summaryEl.textContent = "build meta unavailable";
         });
     })();
   </script>
