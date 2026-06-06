@@ -23,6 +23,31 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: actions/configure-pages@v5
+      - name: Write deploy metadata
+        run: |
+          SHORT_SHA="$(echo "$GITHUB_SHA" | cut -c1-12)"
+          BUILD_DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          cat > public/deploy-meta.json <<EOF
+          {
+            "site": "errordiffusion.cc / errordiffusion.net",
+            "branch": "${GITHUB_REF_NAME}",
+            "track": "live",
+            "version": "${SHORT_SHA}",
+            "build_date": "${BUILD_DATE}",
+            "last_git_sha_short": "${SHORT_SHA}",
+            "last_git_sha": "${GITHUB_SHA}",
+            "last_git_url": "https://github.com/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}",
+            "last_build_at": "${BUILD_DATE}",
+            "last_deployed_at": "${BUILD_DATE}",
+            "changelog_url": "https://github.com/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}",
+            "commits_history_url": "https://github.com/${GITHUB_REPOSITORY}/commits/${GITHUB_REF_NAME}",
+            "changelog_md_url": "https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_REF_NAME}/CHANGELOG.md",
+            "releases_url": "https://github.com/${GITHUB_REPOSITORY}/releases",
+            "workflow_run_url": "https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}",
+            "run_id": "${GITHUB_RUN_ID}",
+            "run_number": "${GITHUB_RUN_NUMBER}"
+          }
+          EOF
       - uses: actions/upload-pages-artifact@v3
         with:
           path: ./public
