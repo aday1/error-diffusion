@@ -28,7 +28,6 @@
     "#ifdef GL_ES",
     "precision mediump float;",
     "#endif",
-    "#extension GL_OES_standard_derivatives : enable",
     "uniform float time;",
     "uniform vec2 resolution;",
     "uniform vec2 mouse;",
@@ -596,17 +595,32 @@
     });
   }
 
+  function syncMediaCaption(plane) {
+    var caption = document.getElementById("screenCaption");
+    if (!caption || !plane) return;
+    var text = plane.getAttribute("data-caption");
+    if (!text) {
+      var img = plane.querySelector("img");
+      text = img ? img.getAttribute("alt") : "";
+    }
+    if (text) caption.textContent = text;
+  }
+
   function initMediaCarousel() {
     var stack = document.getElementById("mediaStack");
     if (!stack) return;
     var planes = stack.querySelectorAll(".media-plane");
     if (planes.length < 2) {
-      var solo = stack.querySelector(".media-plane.active img, .media-plane img");
+      var soloPlane = stack.querySelector(".media-plane.active, .media-plane");
+      var solo = soloPlane ? soloPlane.querySelector("img") : null;
       if (solo) setActiveMoshPlane(solo);
+      syncMediaCaption(soloPlane);
       return;
     }
+    var firstPlane = stack.querySelector(".media-plane.active") || planes[0];
+    syncMediaCaption(firstPlane);
     if (reducedMotion) {
-      var firstImg = stack.querySelector(".media-plane.active img, .media-plane img");
+      var firstImg = firstPlane ? firstPlane.querySelector("img") : stack.querySelector(".media-plane img");
       if (firstImg) setActiveMoshPlane(firstImg);
       return;
     }
@@ -617,6 +631,7 @@
       planes[idx].classList.add("active");
       var img = planes[idx].querySelector("img");
       if (img) setActiveMoshPlane(img);
+      syncMediaCaption(planes[idx]);
       if (global.EdiffVhs && global.EdiffVhs.burst) global.EdiffVhs.burst();
       root.style.setProperty("--tear", String(Math.min(0.42, state.tear + 0.06)));
       var activePlane = planes[idx];

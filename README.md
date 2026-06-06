@@ -12,15 +12,31 @@ This repository is both:
 - Worker router: `src/index.js`
 - Cloudflare config: `wrangler.toml`
 
-The site keeps the original glitch/shader landing-page aesthetic and expands it into an archive homepage with sections for:
+The site keeps the original glitch/shader landing-page aesthetic and expands it into a collaborative artist overview and archive homepage with sections for:
 
+- glitch overview / source DNA
+- aday + lysdexic artist braid
+- source image system
 - news
 - max packs
 - samples
 - gig posters
 - gig scrap
 
-The visual/theme is based on:
+The 2026 overhaul derives its palette and texture from the project's human-made source material:
+
+- `public/library/gig-posters/maggies-art-space-3200x360.png` - acid-green measurement grid and calibration fascia
+- `public/assets/max-patch-1.png` - Max/MSP patch cabling and object-label logic
+- `public/library/media-seeds/horsebazaar-frame-*.jpg` - compression tears and A/V performance stills
+- `public/library/media-seeds/bandcamp-congestion-collapse.jpg` - Transmission Control Protocol cover typography
+- `public/library/gig-scrap/error-defuse*.gif` - older motion scraps
+
+Artist source links are deliberately visible in the hero and artist section:
+
+- Aday Richardson: https://aday.net.au/
+- Jay Curtis / LYSDEXIC: https://www.lysdexic.com/author/lysdexic/
+
+Original visual/theme seed:
 https://codepen.io/aday_net_au/pen/zYqdeEG
 
 Visual stack (WebGL shader + 2D diffusion canvas + theme presets) lives in:
