@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>error diffusion // aday x lysdexic</title>
+  <title>error diffusion // aday x lysdexic [LIVE]</title>
   <meta name="description" content="Collaborative glitch archive and artist overview for Error Diffusion: aday plus lysdexic, Max/MSP TCP audio, OSC shaders, Horse Bazaar visuals, and Transmission Control Protocol debris.">
   <meta name="theme-color" content="#050806">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
@@ -129,6 +129,25 @@
       gap: clamp(1rem, 3vw, 1.6rem);
       align-items: stretch;
       padding-top: clamp(0.75rem, 2vw, 1.2rem);
+    }
+
+    .deploy-lane-top-badge {
+      position: fixed;
+      top: 8px;
+      left: 8px;
+      z-index: 10001;
+      font: 700 10px/1.2 "IBM Plex Mono", ui-monospace, Consolas, monospace;
+      letter-spacing: 0.14em;
+      padding: 4px 8px;
+      border-radius: 3px;
+      border: 1px solid rgba(76, 255, 138, 0.55);
+      color: #efffef;
+      background: rgba(46, 204, 113, 0.35);
+      box-shadow:
+        0 0 16px rgba(76, 255, 138, 0.2),
+        0 2px 10px rgba(0, 0, 0, 0.45);
+      pointer-events: none;
+      text-shadow: 0 0 8px rgba(76, 255, 138, 0.42);
     }
 
     .panel {
@@ -1524,6 +1543,7 @@
   </style>
 </head>
 <body class="errdiff-brand">
+  <div id="deployLaneTopBadge" class="deploy-lane-top-badge" data-lane="live" aria-label="Deploy lane: LIVE">LIVE</div>
   <svg class="svg-filters" aria-hidden="true" width="0" height="0">
     <filter id="filter-discrete" color-interpolation-filters="sRGB">
       <feComponentTransfer>
@@ -2057,19 +2077,24 @@
   </script>
   <div id="deployMetaDock" style="position:fixed;right:10px;bottom:10px;z-index:9999;max-width:min(420px,calc(100vw - 20px));font:11px/1.45 'IBM Plex Mono',ui-monospace,monospace;">
     <div id="deployMetaRestore" hidden style="margin-bottom:6px;text-align:right;">
-      <button type="button" id="deployMetaShowBtn" style="font:inherit;cursor:pointer;padding:4px 10px;border:1px solid #c9a66a;background:rgba(12,9,6,.94);color:#ebe3d8;border-radius:2px;box-shadow:0 2px 10px rgba(0,0,0,.5);">build info</button>
+      <button type="button" id="deployMetaShowBtn" style="font:inherit;cursor:pointer;padding:4px 10px;border:1px solid #4cff8a;background:rgba(0,0,0,.88);color:#b8ffd1;border-radius:3px;box-shadow:0 2px 10px rgba(0,0,0,.45);">build info</button>
     </div>
-    <div id="deployMetaPanel" role="region" aria-label="Build metadata" style="border:1px solid rgba(232,197,144,.42);background:rgba(14,11,8,.96);color:#ebe3d8;box-sizing:border-box;border-radius:2px;box-shadow:0 4px 18px rgba(0,0,0,.55);">
+    <div id="deployMetaPanel" role="region" aria-label="Build metadata" style="border:1px solid #4cff8a;background:rgba(0,0,0,.92);color:#b8ffd1;box-sizing:border-box;border-radius:3px;box-shadow:0 4px 18px rgba(0,0,0,.55);">
       <div id="deployMetaBar" tabindex="0" role="button" aria-expanded="false" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 8px;cursor:pointer;user-select:none;">
         <span id="deployMetaSummary" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Loading...</span>
         <span id="deployMetaExpandGlyph" style="opacity:.85;flex-shrink:0;font-weight:700;">[+]</span>
-        <button type="button" id="deployMetaHideBtn" style="flex-shrink:0;font:inherit;cursor:pointer;padding:2px 6px;margin:0;border:1px solid rgba(232,197,144,.4);background:transparent;color:#ebe3d8;border-radius:2px;">hide</button>
+        <button type="button" id="deployMetaHideBtn" style="flex-shrink:0;font:inherit;cursor:pointer;padding:2px 6px;margin:0;border:1px solid rgba(76,255,138,.55);background:transparent;color:#b8ffd1;border-radius:2px;">hide</button>
+      </div>
+      <div id="deploySwitcherStrip" style="border-top:1px solid rgba(76,255,138,.28);padding:6px 8px;background:rgba(0,0,0,.52);cursor:default;">
+        <span style="display:inline-block;font-weight:800;letter-spacing:.12em;padding:2px 7px;border-radius:2px;border:1px solid rgba(76,255,138,.55);color:#efffef;background:rgba(76,255,138,.18);" title="Current deploy track">LIVE</span>
+        <span aria-hidden="true" style="opacity:.45">|</span>
+        <span style="opacity:.82;font-weight:700">one deploy lane</span>
       </div>
       <div id="deployMetaDetail" hidden style="padding:0 12px 10px;">
-        <div id="deployMetaTitle" style="font-weight:700;color:#f4ecdf;margin:0 0 6px;padding-bottom:4px;border-bottom:1px solid rgba(232,197,144,.3);letter-spacing:.06em;text-transform:uppercase;">build info</div>
+        <div id="deployMetaTitle" style="font-weight:700;color:#fff;margin:0 0 6px;padding-bottom:4px;border-bottom:1px solid rgba(76,255,138,.35);letter-spacing:.06em;text-transform:uppercase;">build info</div>
         <div id="deployMetaBody">Loading deploy metadata...</div>
         <div style="margin-top:8px;">
-          <button type="button" id="deployMetaCollapseBtn" style="font:inherit;cursor:pointer;padding:3px 8px;border:1px solid rgba(232,197,144,.4);background:transparent;color:#ebe3d8;border-radius:2px;">collapse</button>
+          <button type="button" id="deployMetaCollapseBtn" style="font:inherit;cursor:pointer;padding:3px 8px;border:1px solid rgba(76,255,138,.55);background:transparent;color:#b8ffd1;border-radius:2px;">collapse</button>
         </div>
       </div>
     </div>
@@ -2104,7 +2129,9 @@
       var collapseBtn = document.getElementById("deployMetaCollapseBtn");
       var restoreWrap = document.getElementById("deployMetaRestore");
       var showBtn = document.getElementById("deployMetaShowBtn");
-      if (!bodyEl || !panel || !dock || !bar || !summaryEl || !detailEl || !expandGlyph || !hideBtn || !collapseBtn || !restoreWrap || !showBtn) return;
+      var topBadge = document.getElementById("deployLaneTopBadge");
+      var switcherStrip = document.getElementById("deploySwitcherStrip");
+      if (!bodyEl || !panel || !dock || !bar || !summaryEl || !detailEl || !expandGlyph || !hideBtn || !collapseBtn || !restoreWrap || !showBtn || !switcherStrip) return;
       function uiLoad() {
         try {
           var v = localStorage.getItem(LS_KEY);
@@ -2213,15 +2240,57 @@
         if (mo < 24) return mo + "mo since " + tag;
         return Math.round(sec / (365.2425 * 86400)) + "yr since " + tag;
       }
+      function shortAge(iso) {
+        if (!iso) return "";
+        var t = new Date(iso).getTime();
+        if (Number.isNaN(t)) return "";
+        var sec = Math.round((Date.now() - t) / 1000);
+        if (sec < -120) return "";
+        if (sec < 45) return "now";
+        if (sec < 3600) return Math.round(sec / 60) + "m ago";
+        if (sec < 86400) return Math.round(sec / 3600) + "h ago";
+        if (sec < 604800) return Math.round(sec / 86400) + "d ago";
+        if (sec < 4233600) return Math.round(sec / 604800) + "wk ago";
+        var mo = Math.round(sec / (30.4375 * 86400));
+        if (mo < 24) return mo + "mo ago";
+        return Math.round(sec / (365.2425 * 86400)) + "yr ago";
+      }
+      function laneBadgeHtml() {
+        return "<span style=\"display:inline-block;font-weight:800;letter-spacing:.12em;padding:2px 7px;border-radius:2px;border:1px solid rgba(76,255,138,.55);color:#efffef;background:rgba(76,255,138,.18);\" title=\"Current deploy track\">LIVE</span>";
+      }
+      function syncLaneUi(buildIso, depIso) {
+        var buildFresh = shortAge(buildIso);
+        var deployFresh = shortAge(depIso);
+        var title = "LIVE";
+        if (buildFresh) title += " | last updated " + buildFresh;
+        if (deployFresh) title += " | last deployed " + deployFresh;
+        if (topBadge) {
+          topBadge.setAttribute("data-lane", "live");
+          topBadge.setAttribute("title", title);
+          topBadge.setAttribute("aria-label", title);
+          topBadge.textContent = "LIVE";
+        }
+        switcherStrip.innerHTML =
+          laneBadgeHtml() +
+          " <span aria-hidden=\"true\" style=\"opacity:.45\">|</span> " +
+          "<span style=\"opacity:.82;font-weight:700\">Last updated</span> " +
+          "<span style=\"color:#efffef\">" + esc(buildFresh || "unknown") + "</span>" +
+          " <span aria-hidden=\"true\" style=\"opacity:.45\">|</span> " +
+          "<span style=\"opacity:.82;font-weight:700\">Last deployed</span> " +
+          "<span style=\"color:#efffef\">" + esc(deployFresh || "unknown") + "</span>";
+      }
       function render(m) {
         var shaRaw = m.last_git_sha_short || m.version || "?";
         var buildIso = m.last_build_at || m.build_date || "";
         var depIso = m.last_deployed_at || m.last_build_at || m.build_date || "";
         var ageB = age(buildIso, "build");
         var ageD = age(depIso, "deploy");
+        var shortB = shortAge(buildIso);
+        var shortD = shortAge(depIso);
         var siteLab = (m.site ? String(m.site) : "").toUpperCase().replace(/\s+/g, "") || "SITE";
-        var sumParts = [siteLab, String(shaRaw)];
-        if (ageB) sumParts.push(ageB);
+        var sumParts = ["LIVE", siteLab, String(shaRaw)];
+        if (shortB) sumParts.push("updated " + shortB);
+        if (shortD) sumParts.push("deployed " + shortD);
         summaryEl.textContent = sumParts.join(" | ");
         var sha = esc(shaRaw);
         var gitHref = esc(m.last_git_url || m.changelog_url || "#");
@@ -2230,17 +2299,18 @@
         var md = m.changelog_md_url || "";
         var rel = m.releases_url || "";
         var run = m.workflow_run_url || "";
-        var branch = esc(m.track || m.branch || "");
+        var branch = esc(m.branch || "");
         var note = m.deploy_note ? "<div style=\"opacity:.82;margin-top:6px;font-size:10px;\">" + esc(m.deploy_note) + "</div>" : "";
         var title = document.getElementById("deployMetaTitle");
-        if (title) title.textContent = (m.site ? String(m.site).toUpperCase() : "SITE") + " // build info";
-        var html = "";
+        if (title) title.textContent = (m.site ? String(m.site).toUpperCase() : "SITE") + " // LIVE build info";
+        syncLaneUi(buildIso, depIso);
+        var html = "<div style=\"margin:0 0 8px;padding:8px 10px;border:1px solid rgba(76,255,138,.45);background:rgba(76,255,138,.1);border-radius:3px\">" + laneBadgeHtml() + " <strong style=\"color:#efffef\">one deploy lane</strong></div>";
         html += "<div style=\"margin:4px 0\"><strong>Last git:</strong> <a href=\"" + gitHref + "\" target=\"_blank\" rel=\"noopener noreferrer\">" + sha + "</a>";
-        if (branch) html += " <span style=\"opacity:.75\">(" + branch + ")</span>";
+        if (branch) html += " <span style=\"opacity:.75\">(" + branch + " branch)</span>";
         html += "</div>";
         var localTz = tzName();
         if (localTz) html += "<div style=\"opacity:.78;margin:0 0 4px;font-size:10px\"><strong>Your timezone:</strong> " + esc(localTz) + "</div>";
-        html += "<div style=\"margin:4px 0\"><strong>Last build (CI):</strong> " + esc(fmt(buildIso));
+        html += "<div style=\"margin:4px 0\"><strong>Last updated (CI build):</strong> " + esc(fmt(buildIso));
         if (ageB) html += " <span style=\"opacity:.82\">" + esc(ageB) + "</span>";
         html += "</div>";
         html += "<div style=\"margin:4px 0\"><strong>Last deployed (CI push):</strong> " + esc(fmt(depIso));
@@ -2253,7 +2323,7 @@
         if (md) links.push("<a href=\"" + esc(md) + "\" target=\"_blank\" rel=\"noopener noreferrer\">CHANGELOG.md</a>");
         if (rel) links.push("<a href=\"" + esc(rel) + "\" target=\"_blank\" rel=\"noopener noreferrer\">Releases</a>");
         if (links.length) {
-          html += "<div style=\"margin:8px 0 0;padding-top:6px;border-top:1px solid rgba(232,197,144,.35)\"><strong>Changelog / history:</strong> " + links.join(" <span aria-hidden=\"true\">|</span> ") + "</div>";
+          html += "<div style=\"margin:8px 0 0;padding-top:6px;border-top:1px solid rgba(76,255,138,.35)\"><strong>Changelog / history:</strong> " + links.join(" <span aria-hidden=\"true\">|</span> ") + "</div>";
         }
         html += note;
         bodyEl.innerHTML = html;
@@ -2263,7 +2333,8 @@
         .then(render)
         .catch(function () {
           bodyEl.textContent = "Deploy metadata unavailable.";
-          summaryEl.textContent = "build meta unavailable";
+          summaryEl.textContent = "LIVE | build meta unavailable";
+          syncLaneUi("", "");
         });
     })();
   </script>

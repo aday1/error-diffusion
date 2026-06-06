@@ -25,7 +25,7 @@ jobs:
           {
             "site": "errordiffusion.cc / errordiffusion.net",
             "branch": "${GITHUB_REF_NAME}",
-            "track": "${GITHUB_REF_NAME}",
+            "track": "live",
             "version": "${SHORT_SHA}",
             "build_date": "${BUILD_DATE}",
             "last_git_sha_short": "${SHORT_SHA}",
