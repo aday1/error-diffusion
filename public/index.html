@@ -150,6 +150,36 @@
       text-shadow: 0 0 8px rgba(76, 255, 138, 0.42);
     }
 
+    @media (max-width: 680px), (max-height: 480px) {
+      #deployMetaDock {
+        left: 10px !important;
+        right: 10px !important;
+        bottom: 10px !important;
+        width: auto !important;
+        max-width: none !important;
+        font-size: 10px !important;
+      }
+
+      #deployMetaPanel {
+        max-height: min(45svh, 280px);
+        overflow: auto;
+      }
+
+      #deployMetaDetail {
+        max-height: calc(min(45svh, 280px) - 92px);
+        overflow: auto;
+      }
+
+      #deployMetaSummary {
+        white-space: normal !important;
+        line-height: 1.25 !important;
+      }
+
+      #deploySwitcherStrip {
+        line-height: 1.35;
+      }
+    }
+
     .panel {
       position: relative;
       border: 1px solid var(--line);
@@ -1518,6 +1548,75 @@
       }
     }
 
+    @media (max-width: 360px), (max-height: 430px) and (max-width: 760px) {
+      .hero {
+        min-height: auto;
+        padding-top: 0.35rem;
+      }
+
+      .hero-copy {
+        gap: 0.45rem;
+        padding: 0.55rem;
+        padding-bottom: 2.15rem;
+      }
+
+      .hero-copy::after {
+        bottom: 0.45rem;
+        height: 24px;
+      }
+
+      .sysline {
+        font-size: 0.58rem;
+        letter-spacing: 0.1em;
+      }
+
+      .hero-title.ediff-heading {
+        font-size: clamp(1.65rem, 10vw, 2.25rem);
+      }
+
+      .collab-lockup {
+        gap: 0.38rem;
+        font-size: 0.66rem;
+        letter-spacing: 0.08em;
+      }
+
+      .collab-lockup span {
+        padding: 0.34rem 0.4rem;
+      }
+
+      .collab-lockup .join {
+        width: 1.65rem;
+        height: 1.65rem;
+      }
+
+      .summary {
+        font-size: 0.74rem;
+        line-height: 1.32;
+        padding: 0.45rem 0.55rem;
+      }
+
+      .duo-note,
+      .signal-row {
+        display: none;
+      }
+
+      .links a {
+        font-size: 0.62rem;
+        padding: 0.28rem 0.35rem;
+      }
+    }
+
+    @media (max-height: 430px) and (max-width: 760px) {
+      .hero-copy {
+        padding-bottom: 0.65rem;
+      }
+
+      .hero-copy::after,
+      .summary {
+        display: none;
+      }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       *,
       *::before,
@@ -2132,11 +2231,18 @@
       var topBadge = document.getElementById("deployLaneTopBadge");
       var switcherStrip = document.getElementById("deploySwitcherStrip");
       if (!bodyEl || !panel || !dock || !bar || !summaryEl || !detailEl || !expandGlyph || !hideBtn || !collapseBtn || !restoreWrap || !showBtn || !switcherStrip) return;
+      function compactMetaViewport() {
+        try {
+          return window.matchMedia("(max-width: 680px)").matches || window.matchMedia("(max-height: 480px)").matches;
+        } catch (eMq) {
+          return false;
+        }
+      }
       function uiLoad() {
         try {
           var v = localStorage.getItem(LS_KEY);
           if (v === "hidden") return "hidden";
-          if (v === "expanded") return "expanded";
+          if (v === "expanded" && !compactMetaViewport()) return "expanded";
         } catch (eU) {}
         return "collapsed";
       }
