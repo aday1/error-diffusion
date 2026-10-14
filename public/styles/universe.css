@@ -1,0 +1,46 @@
+@font-face { font-family: 'ED Fraktur'; src: url('../assets/ed-fraktur.woff2') format('woff2'); font-display: swap; }
+:root { --green: #8bff94; --cyan: #8bff94; --red: #ff334f; --line: #ff788240; --line-hot: #8bff9470; }
+body { background: radial-gradient(ellipse at 10% 10%, #4c001c55, transparent 48%), repeating-linear-gradient(0deg, #ff465a08 0 1px, transparent 1px 4px), #030604; }
+#glHost { z-index: 0; opacity: .25; mix-blend-mode: screen; }
+.hero-title.ediff-heading { font-family: 'ED Fraktur', 'Cambria Math', serif; font-weight: 400; font-style: normal; letter-spacing: -.02em; line-height: 1.18; text-shadow: 3px 2px #f00, -3px 1px #0f0, 2px -2px #00f; }
+.panel, .artist-card, .source-card, .archive-card { background: linear-gradient(120deg, #11070deb, #06130bdc); border-color: #ff78824d; box-shadow: inset 0 0 20px #ff465a09, 0 0 20px #000; }
+.hero-copy { border-top: 2px solid #8bff94; position: relative; }
+.crt-frame { border-radius: 18px; border: 8px solid #15221a; outline: 1px solid #719c76; box-shadow: 0 0 0 4px #030603, -6px 0 #ff334f66, 6px 0 #8bff9444, 0 0 38px #5aff7822; }
+.crt-head { color: #aaffb8; border-color: #ff788244; }
+.links a, .boot-enter, .universe-controls a, .universe-controls button { color: #baffc4; border: 1px solid #8bff94; background: #07180bdd; box-shadow: inset 0 0 14px #5aff7814, 0 0 9px #5aff7833; text-decoration: none; }
+.links a:hover, .universe-controls a:hover, .universe-controls button:hover { color: #eaffee; box-shadow: inset 0 0 22px #5aff7822, 0 0 21px #5aff7866; }
+.universe-controls { display: flex; align-items: center; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding: 0 0 18px; font-size: 11px; }
+.universe-controls a, .universe-controls button { display: inline-flex; align-items: center; min-height: 44px; padding: 10px 16px; cursor: pointer; font: inherit; letter-spacing: .09em; }
+.universe-controls span { color: #ed9bad; letter-spacing: .14em; }
+.universe-glyph-strip { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 0 18px; border-bottom: 1px solid #ff788233; margin-bottom: 20px; }
+.universe-glyph { display: block; width: 64px; height: 64px; background: url('../assets/dsp-glyphs.png') 0 0 / 300% 200% no-repeat; animation: rune-orbit 29s linear infinite; }
+.universe-glyph:nth-child(2) { background-position: 50% 0; animation-direction: reverse; }
+.universe-glyph:nth-child(3) { background-position: 100% 0; animation-duration: 43s; }
+.universe-glyph:nth-child(4) { background-position: 0 100%; animation-direction: reverse; }
+.universe-glyph:nth-child(5) { background-position: 50% 100%; animation-duration: 37s; }
+.universe-glyph:nth-child(6) { background-position: 100% 100%; animation-direction: reverse; }
+.universe-transmission { color: #adffb9; font-size: 11px; min-height: 2em; margin: 16px 0 0; letter-spacing: .15em; text-transform: uppercase; }
+.universe-transmission.is-tearing { text-shadow: -4px 0 #f03, 4px 0 #3f6; transform: translateX(2px) skewX(-8deg); }
+.artist-media img, .source-grid img { border: 1px solid #a8b5a3; box-shadow: -4px 0 #ff334f66, 4px 0 #8bff9455; }
+.section-head h2 { color: #ddf5d4; text-shadow: 2px 0 #9f244f88, -1px 0 #64df7866; }
+#deployLaneTopBadge, #deployMetaDock { display: none; }
+@keyframes rune-orbit { to { transform: rotate(360deg); } }
+html.universe-still *, html.universe-still *::before, html.universe-still *::after { animation: none !important; }
+html.universe-still :is(#glHost, .diffusion-canvas, .mosh-layer, .noise, .vhs-tear, .diffusion-mask, #ediffGrain) { visibility: hidden; }
+html.universe-still .universe-transmission { transform: none; text-shadow: none; }
+@media (max-width: 800px) {
+ .hero { grid-template-columns: minmax(0,1fr); min-height: 0; }
+ .hero-title.ediff-heading { font-size: clamp(48px, 12vw, 90px); overflow-wrap: normal; }
+ .shell { width: calc(100% - 24px); padding-top: 12px; }
+ .universe-controls { gap: 8px; }
+ .universe-controls > span { display: none; }
+ .universe-glyph { width: clamp(34px, 11vw, 60px); height: clamp(34px, 11vw, 60px); }
+ .artist-grid, .source-grid, .archive-grid, .overview-grid { grid-template-columns: minmax(0,1fr); }
+ .links { display: flex; flex-wrap: wrap; gap: 9px; }
+ .links a { min-height: 44px; display: inline-flex; align-items: center; }
+ .crt-frame { border-width: 5px; }
+ .patch-matrix { overflow-x: auto; max-width: 100%; }
+ audio, video, iframe, img { max-width: 100%; }
+ input, select, textarea { font-size: 16px; }
+}
+@media (prefers-reduced-motion: reduce) { .universe-glyph { animation: none; } .universe-transmission { transform: none !important; text-shadow: none !important; } }

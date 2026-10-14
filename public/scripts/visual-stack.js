@@ -261,7 +261,7 @@
 
     function render() {
       webgl.raf = requestAnimationFrame(render);
-      if (webgl.paused || document.hidden) return;
+      if (webgl.paused || document.hidden || root.classList.contains("universe-still")) return;
       if (!reducedMotion) webgl.uniforms.time.value += 0.01;
       webgl.uniforms.mouse.value.x += (webgl.targetMouse.x - webgl.uniforms.mouse.value.x) * 0.12;
       webgl.uniforms.mouse.value.y += (webgl.targetMouse.y - webgl.uniforms.mouse.value.y) * 0.12;
