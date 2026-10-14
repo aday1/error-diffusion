@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#050805">
+  <title>public signal /pub / Error Diffusion</title>
+  <link rel="stylesheet" href="../styles/pub.css?v=20261014-pub1">
+</head>
+<body>
+  <main class="pub-shell">
+    <nav class="pub-rail" aria-label="pub navigation">
+      <a class="pub-brand" href="/">error diffusion</a>
+      <span>public signal / pub</span>
+      <a href="https://alliance.errordiffusion.net/">alliance</a>
+    </nav>
+
+    <header class="pub-hero">
+      <span class="pub-badge"><i aria-hidden="true"></i> channel grid</span>
+      <h1>public signal</h1>
+      <p>Drops from Alliance <code>/pub/</code> baked onto the main site. Image, audio and video each get a CRT frame. No login.</p>
+    </header>
+
+    <section id="pubGrid" class="pub-grid" aria-live="polite"></section>
+    <section id="pubEmpty" class="pub-empty" hidden>
+      <div class="pub-crt" aria-label="empty channel static">
+        <div class="pub-crt-head">
+          <span>CH 00 / OFF AIR</span>
+          <span>waiting for signal</span>
+        </div>
+        <div class="pub-crt-glass">
+          <canvas class="pub-static" id="pubStatic" width="640" height="360" aria-hidden="true"></canvas>
+          <div class="pub-scan" aria-hidden="true"></div>
+          <div class="pub-soon">
+            <strong>coming soon</strong>
+            <span>drop media into alliance /pub</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <p class="pub-foot">synced from alliance /pub only · private folders stay locked</p>
+  </main>
+  <script src="../scripts/pub-channel.js?v=20261014-pub1"></script>
+  <script>
+    EdiffPub.mountIndex({
+      manifestUrl: './manifest.json?v=20261014-pub1',
+      grid: document.getElementById('pubGrid'),
+      empty: document.getElementById('pubEmpty'),
+      staticCanvas: document.getElementById('pubStatic')
+    });
+  </script>
+</body>
+</html>
