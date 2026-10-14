@@ -10,7 +10,7 @@
   const controls = document.createElement('nav');
   controls.className = 'universe-controls';
   controls.setAttribute('aria-label', 'Error Diffusion');
-  controls.innerHTML = '<a href="https://alliance.errordiffusion.net/">Enter Alliance</a><span>ADAY / LYSDEXIC</span><button type="button" aria-pressed="true">Glitch: on</button>';
+  controls.innerHTML = '<a href="https://alliance.errordiffusion.net/">Enter Alliance</a><a href="/pub/">public /pub</a><span>ADAY / LYSDEXIC</span><button type="button" aria-pressed="true">Glitch: on</button>';
   shell.prepend(controls);
 
   if (!narrow.matches) {
