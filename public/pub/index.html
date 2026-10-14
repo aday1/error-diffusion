@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#050805">
   <title>public signal /pub / Error Diffusion</title>
-  <link rel="stylesheet" href="../styles/pub.css?v=20261014-pub1">
+  <link rel="stylesheet" href="../styles/pub.css?v=20261014-pub2">
 </head>
 <body>
   <main class="pub-shell">
@@ -18,7 +18,8 @@
     <header class="pub-hero">
       <span class="pub-badge"><i aria-hidden="true"></i> channel grid</span>
       <h1>public signal</h1>
-      <p>Drops from Alliance <code>/pub/</code> baked onto the main site. Image, audio and video each get a CRT frame. No login.</p>
+      <p>Drops from Alliance <code>/pub/</code> baked onto this page. Image, audio and video each get a CRT frame. No login.</p>
+      <p class="pub-how">How it works: members upload into Alliance <code>/pub/</code>, then hit <b>Publish /pub to site</b>. A timer bakes that folder only onto <code>errordiffusion.net/pub</code> (usually within a couple of minutes). Empty channel = TV static until something lands.</p>
     </header>
 
     <section id="pubGrid" class="pub-grid" aria-live="polite"></section>
@@ -41,10 +42,10 @@
 
     <p class="pub-foot">synced from alliance /pub only · private folders stay locked</p>
   </main>
-  <script src="../scripts/pub-channel.js?v=20261014-pub1"></script>
+  <script src="../scripts/pub-channel.js?v=20261014-pub2"></script>
   <script>
     EdiffPub.mountIndex({
-      manifestUrl: './manifest.json?v=20261014-pub1',
+      manifestUrl: './manifest.json?v=20261014-pub2',
       grid: document.getElementById('pubGrid'),
       empty: document.getElementById('pubEmpty'),
       staticCanvas: document.getElementById('pubStatic')
