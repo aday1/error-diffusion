@@ -12,19 +12,35 @@ body { background: radial-gradient(ellipse at 10% 10%, #4c001c55, transparent 48
 .universe-controls { display: flex; align-items: center; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding: 0 0 18px; font-size: 11px; }
 .universe-controls a, .universe-controls button { display: inline-flex; align-items: center; min-height: 44px; padding: 10px 16px; cursor: pointer; font: inherit; letter-spacing: .09em; }
 .universe-controls span { color: #ed9bad; letter-spacing: .14em; }
-.universe-glyph-strip { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 0 18px; border-bottom: 1px solid #ff788233; margin-bottom: 20px; }
-.universe-glyph { display: block; width: 64px; height: 64px; background: url('../assets/dsp-glyphs.png') 0 0 / 300% 200% no-repeat; animation: rune-orbit 29s linear infinite; }
-.universe-glyph:nth-child(2) { background-position: 50% 0; animation-direction: reverse; }
-.universe-glyph:nth-child(3) { background-position: 100% 0; animation-duration: 43s; }
-.universe-glyph:nth-child(4) { background-position: 0 100%; animation-direction: reverse; }
-.universe-glyph:nth-child(5) { background-position: 50% 100%; animation-duration: 37s; }
-.universe-glyph:nth-child(6) { background-position: 100% 100%; animation-direction: reverse; }
+.universe-glyph-strip { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 1px; padding: 12px 0 18px; border-bottom: 1px solid #ff788233; margin-bottom: 20px; }
+.universe-channel { position: relative; display: grid; justify-items: center; gap: 4px; min-width: 0; padding: 12px 0 8px; border: 1px solid #83ff9e22; background: linear-gradient(#83ff9e08, #0008); }
+.universe-channel small { position: absolute; top: 3px; left: 5px; color: #eb7088; font: 8px monospace; }
+.universe-channel b { color: #abc6ac; font: 8px monospace; letter-spacing: .12em; }
+.universe-glyph { display: block; width: 64px; height: 64px; background: url('../assets/dsp-glyphs.png') 0 0 / 300% 200% no-repeat; animation: rune-orbit 29s linear infinite; filter: drop-shadow(0 0 5px #85ffab55); }
+.universe-channel:nth-child(2) .universe-glyph { background-position: 50% 0; animation-direction: reverse; }
+.universe-channel:nth-child(3) .universe-glyph { background-position: 100% 0; animation-duration: 43s; }
+.universe-channel:nth-child(4) .universe-glyph { background-position: 0 100%; animation-direction: reverse; }
+.universe-channel:nth-child(5) .universe-glyph { background-position: 50% 100%; animation-duration: 37s; }
+.universe-channel:nth-child(6) .universe-glyph { background-position: 100% 100%; animation-direction: reverse; }
 .universe-transmission { color: #adffb9; font-size: 11px; min-height: 2em; margin: 16px 0 0; letter-spacing: .15em; text-transform: uppercase; }
 .universe-transmission.is-tearing { text-shadow: -4px 0 #f03, 4px 0 #3f6; transform: translateX(2px) skewX(-8deg); }
 .artist-media img, .source-grid img { border: 1px solid #a8b5a3; box-shadow: -4px 0 #ff334f66, 4px 0 #8bff9455; }
 .section-head h2 { color: #ddf5d4; text-shadow: 2px 0 #9f244f88, -1px 0 #64df7866; }
+.hero-title.ediff-heading { color: #edf9d6; filter: drop-shadow(0 0 13px #9aff671c); }
+.hero-copy .summary, .hero-copy .duo-note { position: relative; z-index: 2; }
+.universe-controls { border-bottom: 1px solid #83ff9e33; margin-bottom: 22px; }
+.universe-controls a { background: #bcff60; color: #081105; font-weight: 800; box-shadow: 0 0 18px #a5ff6055, inset 0 0 0 2px #14210a; }
+.universe-controls a:hover { background: #d3ff93; color: #081105; box-shadow: 0 0 28px #a5ff6088; }
+.universe-controls :is(a, button):focus-visible, .links a:focus-visible { outline: 2px solid #f5ffe4; outline-offset: 4px; }
+.universe-meter { display: flex; align-items: center; gap: 12px; margin-top: 26px; padding: 12px 0 0; border-top: 1px solid #83ff9e33; color: #a4bb9e; font: 9px monospace; letter-spacing: .1em; }
+.universe-meter > div { display: flex; align-items: end; flex: 1; height: 26px; gap: 3px; min-width: 0; }
+.universe-meter i { flex: 1; height: 100%; background: linear-gradient(#ff5e73 0 12%, #caff60 12% 28%, #6aff91 28%); transform: scaleY(var(--level)); transform-origin: bottom; animation: return-level 3.7s steps(7, end) var(--delay) infinite alternate; opacity: .7; }
+.artist-card, .archive-card { border-top: 2px solid #8bff9466; }
+.section-head { border-left: 3px solid #bdff64; padding-left: 16px; }
+html.universe-background .universe-glyph, html.universe-background .universe-meter i { animation-play-state: paused; }
 #deployLaneTopBadge, #deployMetaDock { display: none; }
 @keyframes rune-orbit { to { transform: rotate(360deg); } }
+@keyframes return-level { to { transform: scaleY(calc(1 - var(--level) * .65)); opacity: .95; } }
 html.universe-still *, html.universe-still *::before, html.universe-still *::after { animation: none !important; }
 html.universe-still :is(#glHost, .diffusion-canvas, .mosh-layer, .noise, .vhs-tear, .diffusion-mask, #ediffGrain) { visibility: hidden; }
 html.universe-still .universe-transmission { transform: none; text-shadow: none; }
@@ -34,7 +50,9 @@ html.universe-still .universe-transmission { transform: none; text-shadow: none;
  .shell { width: calc(100% - 24px); padding-top: 12px; }
  .universe-controls { gap: 8px; }
  .universe-controls > span { display: none; }
- .universe-glyph { width: clamp(34px, 11vw, 60px); height: clamp(34px, 11vw, 60px); }
+ .universe-glyph { width: clamp(28px, 8vw, 60px); height: clamp(28px, 8vw, 60px); }
+ .universe-meter { gap: 7px; font-size: 8px; }
+ .universe-meter > div { gap: 2px; }
  .artist-grid, .source-grid, .archive-grid, .overview-grid { grid-template-columns: minmax(0,1fr); }
  .links { display: flex; flex-wrap: wrap; gap: 9px; }
  .links a { min-height: 44px; display: inline-flex; align-items: center; }
@@ -43,4 +61,4 @@ html.universe-still .universe-transmission { transform: none; text-shadow: none;
  audio, video, iframe, img { max-width: 100%; }
  input, select, textarea { font-size: 16px; }
 }
-@media (prefers-reduced-motion: reduce) { .universe-glyph { animation: none; } .universe-transmission { transform: none !important; text-shadow: none !important; } }
+@media (prefers-reduced-motion: reduce) { .universe-glyph, .universe-meter i { animation: none; } .universe-transmission { transform: none !important; text-shadow: none !important; } }
