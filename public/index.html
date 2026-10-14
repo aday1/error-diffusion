@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>error diffusion // aday x lysdexic [LIVE]</title>
-  <meta name="description" content="Collaborative glitch archive and artist overview for Error Diffusion: aday plus lysdexic, Max/MSP TCP audio, OSC shaders, Horse Bazaar visuals, and Transmission Control Protocol debris.">
+  <title>error diffusion // aday x lysdexic</title>
+  <meta name="description" content="aday + lysdexic. broken audio, bleeding frames, experiments left running. error diffusion.">
   <meta name="theme-color" content="#050806">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Newsreader:ital,opsz,wght@0,6..72,700;1,6..72,400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles/visual.css?v=20260606-glitch-overview">
+  <link rel="stylesheet" href="styles/visual.css?v=20261014-mobile-calm">
   <style>
     :root {
       color-scheme: dark;
@@ -1449,8 +1449,10 @@
 
     @media (max-width: 680px) {
       :root {
-        --rgb-shift: 3px;
+        --rgb-shift: 0px;
         --diffusion-cell: 12px;
+        --tear: 0.04;
+        --pulse: 0.06;
       }
 
       .shell {
@@ -1464,24 +1466,24 @@
       .hero-copy {
         gap: 0.74rem;
         padding: 0.75rem;
-        padding-bottom: 3.65rem;
+        padding-bottom: 1.15rem;
       }
 
       .hero-title.ediff-heading {
-        font-size: clamp(2rem, 12vw, 3.15rem);
+        font-size: clamp(2.2rem, 11vw, 3.1rem);
         min-height: auto;
-        overflow-wrap: anywhere;
+        overflow-wrap: normal;
       }
 
       .summary {
-        font-size: 0.84rem;
-        line-height: 1.42;
-        padding: 0.65rem 0.72rem;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        padding: 0.7rem 0.8rem;
       }
 
       .duo-note {
-        font-size: 0.76rem;
-        line-height: 1.42;
+        font-size: 0.84rem;
+        line-height: 1.55;
       }
 
       .badge,
@@ -1640,7 +1642,7 @@
       }
     }
   </style>
-  <link rel="stylesheet" href="styles/universe.css?v=20261014-feedback">
+  <link rel="stylesheet" href="styles/universe.css?v=20261014-mobile-calm">
 </head>
 <body class="errdiff-brand">
   <div id="deployLaneTopBadge" class="deploy-lane-top-badge" data-lane="live" aria-label="Deploy lane: LIVE">LIVE</div>
@@ -1664,7 +1666,7 @@
   <div id="bootOverlay" class="boot-overlay" hidden>
     <div class="boot-card">
       <strong>ediff-router boot</strong>
-      <span>TCP patch fragments, Horse Bazaar frames, acid-grid poster debris, and album typography are loading into the signal bus.</span>
+      <span>hang on. the last frame is still in here.</span>
       <button type="button" id="bootEnter" class="boot-enter">enter signal</button>
     </div>
   </div>
@@ -1680,7 +1682,7 @@
   <main class="shell">
     <section class="hero" id="top">
       <div class="panel hero-copy">
-        <p class="sysline">aday x lysdexic / damaged transport art</p>
+        <p class="sysline">aday x lysdexic / live archive</p>
         <h1 class="hero-title ediff-heading glitch" data-plain="error diffusion" aria-label="error diffusion">error diffusion</h1>
         <div class="collab-lockup" aria-label="Error Diffusion collaborators">
           <span>aday</span>
@@ -1688,17 +1690,16 @@
           <span>lysdexic</span>
         </div>
         <p class="summary">
-          A collaborative artist site for Aday Richardson and Jay Curtis / LYSDEXIC: Max/MSP TCP audio,
-          OSC shaders, Horse Bazaar frame damage, and error-diffusion visuals folded into one archive-performance interface.
+          A shared DIY signal between aday and lysdexic —
+          stems, patches, posters, and damaged frames left running on purpose.
         </p>
         <p class="duo-note">
-          <strong>Error Diffusion</strong> is the collision point: aday's modded live-code stack on one channel;
-          lysdexic's Max/RNBO, modular synthesis, drum machines, and spectral DSP work on the other.
+          Drop a stem. Break the patch. Keep what sticks before it leaks.
         </p>
         <div class="signal-row" aria-label="system signals">
           <span class="badge green">OSC 4005</span>
           <span class="badge blue">INTERNAL 4000/4001</span>
-          <span class="badge hot">CURTIS 4020</span>
+          <span class="badge hot">LYSDEXIC 4020</span>
           <span class="badge green">TOUCHOSC 8000</span>
           <span class="badge">transport @tempo 90</span>
         </div>
@@ -1706,11 +1707,11 @@
           <a href="https://aday.net.au" target="_blank" rel="noopener noreferrer">aday.net.au</a>
           <a href="https://www.lysdexic.com/author/lysdexic/" target="_blank" rel="noopener noreferrer">lysdexic.com</a>
           <a href="https://github.com/aday1/error-diffusion">GitHub source</a>
-          <a href="#overview">glitch overview</a>
-          <a href="#artists">artist braid</a>
-          <a href="#visual-system">source image system</a>
-          <a href="#media">media / releases</a>
-          <a href="#archive">public library</a>
+          <a href="#overview">the mess</a>
+          <a href="#artists">aday + lysdexic</a>
+          <a href="#visual-system">frame damage</a>
+          <a href="#media">watch / listen</a>
+          <a href="#archive">open drawer</a>
         </div>
       </div>
 
@@ -1743,20 +1744,20 @@
           </div>
         </div>
         <p class="now-playing" id="nowPlaying">
-          Signal path locked to TCP / OSC patch output: diffusion grain plus RGB drift follow pointer pressure, fake analyser values, and the FX bank below.
+          old frames dragged through the next one. keep the bits that go wrong.
         </p>
       </aside>
     </section>
 
     <section class="section" id="overview">
       <div class="section-head">
-        <h2>Glitch overview</h2>
-        <p>One front page for the collaboration: project identity, human-made source material, release evidence, and public archive routes.</p>
+        <h2>the mess</h2>
+        <p>patches, gig scraps, sounds we left lying around. help yourself.</p>
       </div>
       <div class="source-grid">
         <article class="source-card">
-          <h3>Visual DNA</h3>
-          <p><strong>Sampled from the archive:</strong> the Maggie's Art Space calibration strip, Max patch cabling, Horse Bazaar compression tears, TCP cover geometry, and old Error Defuse motion scraps.</p>
+          <h3>frames left behind</h3>
+          <p>Horse Bazaar frames, Maggie's poster strip, old Error Defuse loops. drag them through it again.</p>
           <div class="source-links">
             <a href="library/gig-posters/maggies-art-space-3200x360.png">poster strip</a>
             <a href="assets/max-patch-1.png">max patch</a>
@@ -1764,8 +1765,8 @@
           </div>
         </article>
         <article class="source-card">
-          <h3>Sound DNA</h3>
-          <p><strong>Network audio as composition:</strong> TCP sketches, hocket logic, granular patching, OSC faders, and a release-world that points directly at CONGESTION COLLAPSE on the Transmission Control Protocol LP.</p>
+          <h3>audio leaking</h3>
+          <p>TCP audio, granular bits, faders left up. CONGESTION COLLAPSE is down there if you want to hear where it ended up.</p>
           <div class="source-links">
             <a href="library/max-packs/error-diff-tcp/README.md">tcp notes</a>
             <a href="library/docs/osc-addresses-max-umenu.csv">osc map</a>
@@ -1773,8 +1774,8 @@
           </div>
         </article>
         <article class="source-card">
-          <h3>Web DNA</h3>
-          <p><strong>Aday's public stack is part of the instrument:</strong> aday.net.au, Macroverse, ArtBastard, GitHub Pages backup, and the Cloudflare Worker route all sit inside the project map instead of living as footnotes.</p>
+          <h3>other open tabs</h3>
+          <p>more things left running. shaders over there. lights over there. probably another patch open.</p>
           <div class="source-links">
             <a href="https://aday.net.au" target="_blank" rel="noopener noreferrer">aday.net.au</a>
             <a href="https://macroverse.aday.net.au" target="_blank" rel="noopener noreferrer">macroverse</a>
@@ -1798,14 +1799,14 @@
 
     <section class="section" id="artists">
       <div class="section-head">
-        <h2>Artist braid</h2>
-        <p>Aday and Curtis stay visible as the two contributors, with their outside profiles wired into the archive instead of being hidden in a footer.</p>
+        <h2>aday + lysdexic</h2>
+        <p>two ends of the same dodgy cable.</p>
       </div>
       <div class="artist-grid">
         <article class="artist-card aday">
           <div class="artist-copy">
-            <h3>aday / keyboard, network patch, visual systems</h3>
-            <p>Aday's online profile frames the practice around open-source enthusiasm, modded hardware, chip energy, creative coding, and live control tools. Error Diffusion inherits that world through Macroverse shaders, ArtBastard stage control, and the public GitHub source trail.</p>
+            <h3>aday / keys, code, loose wires</h3>
+            <p>keyboards, modded hardware, shaders. things plugged into things they probably weren’t meant for. more of my mess at aday.net.au.</p>
             <div class="artist-tags">
               <span>keyboard</span>
               <span>OSC</span>
@@ -1815,7 +1816,7 @@
             </div>
             <div class="source-links">
               <a href="https://aday.net.au" target="_blank" rel="noopener noreferrer">aday.net.au</a>
-              <a href="https://github.com/aday1" target="_blank" rel="noopener noreferrer">source trail</a>
+              <a href="https://github.com/aday1" target="_blank" rel="noopener noreferrer">code</a>
             </div>
           </div>
           <div class="artist-media">
@@ -1825,8 +1826,8 @@
 
         <article class="artist-card lysdexic">
           <div class="artist-copy">
-            <h3>lysdexic / synthesis, RNBO, production</h3>
-            <p>Jay Curtis / LYSDEXIC connects Error Diffusion to audio programming, media art, data research, Max/MSP, RNBO on Raspberry Pi, modular synthesis, custom DSP tools, and production. The lysdexic profile and Bandcamp archive place the collaboration in Melbourne experimental electronic, glitch, drone, and noise territory.</p>
+            <h3>lysdexic / synths, drums, feedback</h3>
+            <p>Max patches, modular, drum machines. spectral bits caught in the reverb. follow lysdexic out of here for the sounds and whatever happens next.</p>
             <div class="artist-tags">
               <span>synthesis</span>
               <span>drum machines</span>
@@ -1848,16 +1849,16 @@
 
     <section class="section" id="visual-system">
       <div class="section-head">
-        <h2>Source image system</h2>
-        <p>The redesign keeps the human-contributed art in the foreground: no stock texture, just poster measurements, performance frames, cover typography, and patch-cord logic.</p>
+        <h2>frame damage</h2>
+        <p>stuff from the gigs, the patches, the hard drive. still bleeding through.</p>
       </div>
       <div class="visual-grid">
         <article class="visual-card visual-poster">
-          <h3>Maggie's grid fascia</h3>
-          <p>Acid-green alignment marks, calibration bars, and venue text become the site's measurement layer and hero underglow.</p>
+          <h3>Maggie's / cut here</h3>
+          <p>the poster was 3200 pixels wide. the green got everywhere.</p>
         </article>
         <article class="visual-card">
-          <h3>Texture bank</h3>
+          <h3>bits of the night</h3>
           <div class="visual-mosaic">
             <figure><img src="library/media-seeds/horsebazaar-frame-03.jpg" alt="Horse Bazaar frame grab"></figure>
             <figure><img src="library/media-seeds/horsebazaar-frame-04.jpg" alt="Horse Bazaar red compression frame"></figure>
@@ -1872,8 +1873,8 @@
 
     <section class="section" id="fx-bank">
       <div class="section-head">
-        <h2>Patch-database FX rig</h2>
-        <p>Pointer and fake analyser values drive CSS diffusion; this grid renders as a playful Max-ish patch bay (procedural grid, scope shimmer, braided cords).</p>
+        <h2>leave the faders up</h2>
+        <p>move things. see what sticks. arm the audio if you want the sound in it too.</p>
       </div>
       <!-- Pretend MSP patch visuals: braided cords + scope shimmer + drifting plasma-ish wash (study refs: CodePen yoemmz rNVqJaq VwprebG dYqYzw vEKXema BaRMJM — no iframes) -->
       <div class="panel matrix patch-matrix">
@@ -1892,14 +1893,14 @@
 
     <section class="section" id="media">
       <div class="section-head">
-        <h2>Media / releases</h2>
-        <p>Live capture from the Error Diffusion orbit: Horse Bazaar A/V, Transmission Control Protocol LP, and the CONGESTION COLLAPSE single.</p>
+        <h2>watch / listen</h2>
+        <p>some of it made it out.</p>
       </div>
       <div class="panel">
         <div class="media-grid">
           <article class="media-card">
             <h3>Tom Hall : Lysdexic vs aday @ Horse Bazaar</h3>
-            <p>Performance capture (YouTube). Stills below are frame grabs from this set, seeded into the site texture bank.</p>
+            <p>Horse Bazaar. some of these frames are still stuck in the page.</p>
             <div class="media-embed-wrap">
               <iframe
                 src="https://www.youtube-nocookie.com/embed/_r3JFq23iy4"
@@ -1957,8 +1958,8 @@
 
     <section class="section" id="archive">
       <div class="section-head">
-        <h2>Public archive routes</h2>
-        <p>Local files only for the core visuals. Patches, docs, samples, TouchOSC, and performance scraps stay directly reachable.</p>
+        <h2>open drawer</h2>
+        <p>patches, samples, old gig bits. take a look. lose track.</p>
       </div>
       <div class="archive-grid">
         <article class="archive-card" id="max-pack">
@@ -1999,7 +2000,7 @@
             <img src="library/gig-posters/maggies-art-space-3200x360.png" alt="Maggie's Art Space poster strip preview">
           </div>
           <h3>Gig poster strip</h3>
-          <p>Wide 3200x360 visual strip, staged as projection fascia and banner texture.</p>
+          <p>3200 × 360. stretch it across something.</p>
           <div class="archive-links">
             <a href="library/gig-posters/maggies-art-space-3200x360.png">maggies-art-space-3200x360.png</a>
           </div>
@@ -2042,7 +2043,7 @@
 
     <footer class="footer">
       <span>errordiffusion.cc / errordiffusion.net</span>
-      <span>darl.ns.cloudflare.com :: elisabeth.ns.cloudflare.com</span>
+      <span>last frame still hanging</span>
       <span>
         <a href="https://aday.net.au" target="_blank" rel="noopener noreferrer">aday.net.au</a>
         ::
@@ -2054,7 +2055,7 @@
           <img src="library/logos/lysdexic-logo.png" width="120" height="28" alt="lysdexic">
         </a>
       </span>
-      <a href="#top">return to signal top</a>
+      <a href="#top">back into it</a>
     </footer>
   </main>
 
@@ -2445,6 +2446,6 @@
         });
     })();
   </script>
-  <script src="scripts/universe.js?v=20261014-feedback"></script>
+  <script src="scripts/universe.js?v=20261014-mobile-calm"></script>
 </body>
 </html>

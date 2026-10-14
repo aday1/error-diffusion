@@ -448,6 +448,36 @@
   animation: none;
 }
 
+@media (max-width: 800px) {
+  .ediff-heading {
+    animation: none;
+  }
+
+  .ediff-heading::before,
+  .ediff-heading::after {
+    display: none;
+  }
+
+  [data-theme="rgb"] .ediff-heading {
+    text-shadow: 1px 0 #f044, -1px 0 #0f04;
+    animation: none;
+  }
+
+  .diffusion-mask,
+  .vhs-tear,
+  .noise,
+  .phosphor-fog,
+  #ediffGrain,
+  #glHost,
+  .diffusion-canvas {
+    animation: none !important;
+  }
+
+  .mosh-layer {
+    display: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ediff-heading.anime-wait {
     opacity: 1;

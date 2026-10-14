@@ -2,35 +2,113 @@
   'use strict';
   const root = document.documentElement;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  const narrow = matchMedia('(max-width: 800px)');
   const shell = document.querySelector('.shell');
   const hero = document.querySelector('.hero-copy');
   if (!shell || !hero) return;
-  const controls = document.createElement('nav'); controls.className = 'universe-controls'; controls.setAttribute('aria-label', 'Error Diffusion');
-  controls.innerHTML = '<a href="https://alliance.errordiffusion.net/">Enter Alliance</a><span>ADAY / LYSDEXIC / SIGNAL DAMAGE</span><button type="button" aria-pressed="true">Glitch: on</button>';
+
+  const controls = document.createElement('nav');
+  controls.className = 'universe-controls';
+  controls.setAttribute('aria-label', 'Error Diffusion');
+  controls.innerHTML = '<a href="https://alliance.errordiffusion.net/">Enter Alliance</a><span>ADAY / LYSDEXIC</span><button type="button" aria-pressed="true">Glitch: on</button>';
   shell.prepend(controls);
-  const strip = document.createElement('div'); strip.className = 'universe-glyph-strip'; strip.setAttribute('aria-hidden', 'true');
-  strip.innerHTML = ['INPUT', 'PATCH', 'STEMS', 'SCOPE', 'PRINT', 'LOCK'].map((label, i) => `<span class="universe-channel"><small>0${i + 1}</small><i class="universe-glyph"></i><b>${label}</b></span>`).join(''); hero.prepend(strip);
-  const meter = document.createElement('div'); meter.className = 'universe-meter'; meter.setAttribute('aria-hidden', 'true');
-  meter.innerHTML = '<span>FEEDBACK / RETURN</span><div>' + Array.from({length: 32}, (_, i) => `<i style="--level:${.18 + ((i * 17 + 5) % 29) / 35};--delay:-${i * .21}s"></i>`).join('') + '</div><span>∞</span>';
-  hero.append(meter);
-  const transmission = document.createElement('p'); transmission.className = 'universe-transmission';
-  transmission.textContent = 'BREAKCORE / SIGNAL COLLISION'; hero.querySelector('h1')?.after(transmission);
-  const lines = ['BREAKCORE / SIGNAL COLLISION', 'DSP / FEEDBACK / REVERBERATION', 'DATAMOSH / PACKET LOSS / DOOM', 'TWO HEADS / SAME FREQUENCY', 'KEYBOARD / PHASE / FRACTURE'];
-  let index = 0, preference = null;
-  try { preference = localStorage.getItem('ed-universe-motion'); } catch (_) {}
+
+  if (!narrow.matches) {
+    const strip = document.createElement('div');
+    strip.className = 'universe-glyph-strip';
+    strip.setAttribute('aria-hidden', 'true');
+    strip.innerHTML = ['INPUT', 'PATCH', 'STEMS', 'SCOPE', 'PRINT', 'LOCK']
+      .map((label, i) => `<span class="universe-channel"><small>0${i + 1}</small><i class="universe-glyph"></i><b>${label}</b></span>`)
+      .join('');
+    hero.prepend(strip);
+
+    const meter = document.createElement('div');
+    meter.className = 'universe-meter';
+    meter.setAttribute('aria-hidden', 'true');
+    meter.innerHTML = '<span>FEEDBACK</span><div>' +
+      Array.from({ length: 24 }, (_, i) => `<i style="--level:${0.22 + ((i * 17 + 5) % 29) / 40}"></i>`).join('') +
+      '</div><span>LIVE</span>';
+    hero.append(meter);
+  }
+
+  const transmission = document.createElement('p');
+  transmission.className = 'universe-transmission';
+  transmission.textContent = 'shared archive / still recording';
+  hero.querySelector('h1')?.after(transmission);
+
+  const lines = [
+    'shared archive / still recording',
+    'stems, patches, posters, debris',
+    'aday x lysdexic',
+    'leave the machine on',
+    'find it before it leaks'
+  ];
+  let index = 0;
+  const motionKey = 'ed-universe-motion-v2';
+  let preference = null;
+  try { preference = localStorage.getItem(motionKey); } catch (_) {}
+
+  // Mobile starts calm. Desktop keeps atmospheric glitch unless turned off.
+  if (preference == null) preference = narrow.matches ? 'off' : 'on';
+
   const button = controls.querySelector('button');
   function sync() {
     const active = !reduce.matches && preference !== 'off';
     root.classList.toggle('universe-still', !active);
     button.textContent = reduce.matches ? 'Reduced motion' : `Glitch: ${active ? 'on' : 'off'}`;
-    button.setAttribute('aria-pressed', String(active)); button.disabled = reduce.matches;
+    button.setAttribute('aria-pressed', String(active));
+    button.disabled = reduce.matches;
   }
-  button.addEventListener('click', () => { preference = root.classList.contains('universe-still') ? 'on' : 'off'; try { localStorage.setItem('ed-universe-motion', preference); } catch (_) {} sync(); });
-  reduce.addEventListener('change', sync); sync();
+  button.addEventListener('click', () => {
+    preference = root.classList.contains('universe-still') ? 'on' : 'off';
+    try { localStorage.setItem(motionKey, preference); } catch (_) {}
+    sync();
+  });
+  reduce.addEventListener('change', sync);
+  narrow.addEventListener('change', sync);
+  sync();
   document.addEventListener('visibilitychange', () => root.classList.toggle('universe-background', document.hidden));
+
+  const screen = document.getElementById('crtScreen');
+  if (screen && !narrow.matches) {
+    const debris = document.createElement('div');
+    debris.className = 'universe-frame-debris';
+    debris.setAttribute('aria-hidden', 'true');
+    screen.append(debris);
+    let previousFrame = '';
+    setInterval(() => {
+      if (document.hidden || reduce.matches || root.classList.contains('universe-still')) return;
+      const bounds = screen.getBoundingClientRect();
+      if (bounds.bottom < 0 || bounds.top > innerHeight) return;
+      const source = screen.querySelector('.media-plane.active img');
+      if (!source?.complete || !source.naturalWidth) return;
+      const frame = source.currentSrc || source.src;
+      const fragment = document.createDocumentFragment();
+      for (let i = 0; i < 3; i++) {
+        const block = document.createElement('img');
+        block.src = i % 2 === 0 && previousFrame ? previousFrame : frame;
+        block.alt = '';
+        block.draggable = false;
+        const top = 10 + Math.random() * 70;
+        const height = 5 + Math.random() * 10;
+        block.style.clipPath = `inset(${top}% ${i % 2 ? 0 : 10}% ${100 - top - height}% ${i % 2 ? 6 : 0}%)`;
+        block.style.setProperty('--slip', `${(Math.random() - 0.5) * 14}%`);
+        block.style.setProperty('--drop', `${Math.random() * 3 - 1}%`);
+        block.style.setProperty('--echo-delay', `${i * 40}ms`);
+        fragment.append(block);
+      }
+      debris.replaceChildren(fragment);
+      previousFrame = frame;
+      setTimeout(() => debris.replaceChildren(), 1400);
+    }, 7200);
+  }
+
   setInterval(() => {
     if (document.hidden || root.classList.contains('universe-still')) return;
     transmission.classList.add('is-tearing');
-    setTimeout(() => { transmission.textContent = lines[++index % lines.length]; transmission.classList.remove('is-tearing'); }, 180);
-  }, 4800);
+    setTimeout(() => {
+      transmission.textContent = lines[++index % lines.length];
+      transmission.classList.remove('is-tearing');
+    }, 280);
+  }, narrow.matches ? 9000 : 7000);
 })();
