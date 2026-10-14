@@ -44,12 +44,12 @@
     'find it before it leaks'
   ];
   let index = 0;
-  const motionKey = 'ed-universe-motion-v2';
+  const motionKey = 'ed-universe-motion-v3';
   let preference = null;
   try { preference = localStorage.getItem(motionKey); } catch (_) {}
 
-  // Mobile starts calm. Desktop keeps atmospheric glitch unless turned off.
-  if (preference == null) preference = narrow.matches ? 'off' : 'on';
+  // Atmospheric glitch on by default (background shaders). Toggle still kills via universe-still.
+  if (preference == null) preference = 'on';
 
   const button = controls.querySelector('button');
   function sync() {
@@ -70,12 +70,14 @@
   document.addEventListener('visibilitychange', () => root.classList.toggle('universe-background', document.hidden));
 
   const screen = document.getElementById('crtScreen');
-  if (screen && !narrow.matches) {
+  if (screen) {
     const debris = document.createElement('div');
     debris.className = 'universe-frame-debris';
     debris.setAttribute('aria-hidden', 'true');
     screen.append(debris);
     let previousFrame = '';
+    const debrisGap = narrow.matches ? 14000 : 7200;
+    const debrisPieces = narrow.matches ? 2 : 3;
     setInterval(() => {
       if (document.hidden || reduce.matches || root.classList.contains('universe-still')) return;
       const bounds = screen.getBoundingClientRect();
@@ -84,7 +86,7 @@
       if (!source?.complete || !source.naturalWidth) return;
       const frame = source.currentSrc || source.src;
       const fragment = document.createDocumentFragment();
-      for (let i = 0; i < 3; i++) {
+      for (let i = 0; i < debrisPieces; i++) {
         const block = document.createElement('img');
         block.src = i % 2 === 0 && previousFrame ? previousFrame : frame;
         block.alt = '';
@@ -92,15 +94,16 @@
         const top = 10 + Math.random() * 70;
         const height = 5 + Math.random() * 10;
         block.style.clipPath = `inset(${top}% ${i % 2 ? 0 : 10}% ${100 - top - height}% ${i % 2 ? 6 : 0}%)`;
-        block.style.setProperty('--slip', `${(Math.random() - 0.5) * 14}%`);
+        block.style.setProperty('--slip', `${(Math.random() - 0.5) * (narrow.matches ? 8 : 14)}%`);
         block.style.setProperty('--drop', `${Math.random() * 3 - 1}%`);
         block.style.setProperty('--echo-delay', `${i * 40}ms`);
+        if (narrow.matches) block.style.opacity = '0.55';
         fragment.append(block);
       }
       debris.replaceChildren(fragment);
       previousFrame = frame;
-      setTimeout(() => debris.replaceChildren(), 1400);
-    }, 7200);
+      setTimeout(() => debris.replaceChildren(), narrow.matches ? 1100 : 1400);
+    }, debrisGap);
   }
 
   setInterval(() => {
@@ -109,6 +112,6 @@
     setTimeout(() => {
       transmission.textContent = lines[++index % lines.length];
       transmission.classList.remove('is-tearing');
-    }, 280);
-  }, narrow.matches ? 9000 : 7000);
+    }, narrow.matches ? 220 : 280);
+  }, narrow.matches ? 11000 : 7000);
 })();

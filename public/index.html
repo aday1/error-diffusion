@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Newsreader:ital,opsz,wght@0,6..72,700;1,6..72,400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles/visual.css?v=20261014-mobile-calm">
+  <link rel="stylesheet" href="styles/visual.css?v=20261014-shader-mobile">
   <style>
     :root {
       color-scheme: dark;
@@ -1500,7 +1500,7 @@
       }
 
       .crt-panel {
-        display: none;
+        display: block;
       }
 
       .crt-head,
@@ -1515,8 +1515,8 @@
       }
 
       .screen {
-        min-height: 240px;
-        aspect-ratio: 4 / 5;
+        min-height: 180px;
+        aspect-ratio: 16 / 10;
       }
 
       .quick-jump,
@@ -1642,7 +1642,7 @@
       }
     }
   </style>
-  <link rel="stylesheet" href="styles/universe.css?v=20261014-mobile-calm">
+  <link rel="stylesheet" href="styles/universe.css?v=20261014-shader-mobile">
 </head>
 <body class="errdiff-brand">
   <div id="deployLaneTopBadge" class="deploy-lane-top-badge" data-lane="live" aria-label="Deploy lane: LIVE">LIVE</div>
@@ -1703,15 +1703,18 @@
           <span class="badge green">TOUCHOSC 8000</span>
           <span class="badge">transport @tempo 90</span>
         </div>
-        <div class="links" aria-label="primary links">
+        <div class="links hero-actions" aria-label="primary links">
+          <a class="hero-primary" href="https://alliance.errordiffusion.net/">Enter Alliance</a>
+          <a href="#artists">aday + lysdexic</a>
+          <a href="#archive">open drawer</a>
           <a href="https://aday.net.au" target="_blank" rel="noopener noreferrer">aday.net.au</a>
           <a href="https://www.lysdexic.com/author/lysdexic/" target="_blank" rel="noopener noreferrer">lysdexic.com</a>
+        </div>
+        <div class="links" aria-label="more links">
           <a href="https://github.com/aday1/error-diffusion">GitHub source</a>
           <a href="#overview">the mess</a>
-          <a href="#artists">aday + lysdexic</a>
           <a href="#visual-system">frame damage</a>
           <a href="#media">watch / listen</a>
-          <a href="#archive">open drawer</a>
         </div>
       </div>
 
@@ -2213,8 +2216,8 @@
   <script src="scripts/vfx/mosh-packet-loss.js"></script>
   <script src="scripts/vfx/vhs-debris.js"></script>
   <script src="scripts/vfx/glitch-heading.js"></script>
-  <script src="scripts/vfx/shader-fx-bridge.js"></script>
-  <script src="scripts/visual-stack.js?v=20260606-glitch-overview"></script>
+  <script src="scripts/vfx/shader-fx-bridge.js?v=20261014-shader-mobile"></script>
+  <script src="scripts/visual-stack.js?v=20261014-shader-mobile"></script>
   <script>
     (function () {
       var META_URL = "./deploy-meta.json";
@@ -2446,6 +2449,6 @@
         });
     })();
   </script>
-  <script src="scripts/universe.js?v=20261014-mobile-calm"></script>
+  <script src="scripts/universe.js?v=20261014-shader-mobile"></script>
 </body>
 </html>

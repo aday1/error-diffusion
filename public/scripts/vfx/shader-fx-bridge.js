@@ -26,12 +26,16 @@
         warp
       )
       .replace(
-        "  field = field * 0.68 + mouseGlow * 0.36;",
-        "  field = field * (0.68 + FX1 * 0.22) + mouseGlow * (0.36 + FX4 * 0.28);"
+        "  field = field * 0.68 + mouseGlow * 0.36 + beam * 0.18;",
+        "  field = field * (0.68 + FX1 * 0.22) + mouseGlow * (0.36 + FX4 * 0.28) + beam * (0.18 + FX2 * 0.12);"
       )
       .replace(
         "  float dither = bayer4(gl_FragCoord.xy);",
         "  float dither = bayer4(gl_FragCoord.xy + vec2(FX4 * 8.0, FX2 * 6.0));"
+      )
+      .replace(
+        "  float tearGate = smoothstep(0.92, 0.995, hash21(vec2(floor(uv.y * 28.0), floor(slow))));",
+        "  float tearGate = smoothstep(0.90 - FX1 * 0.08, 0.995, hash21(vec2(floor(uv.y * 28.0), floor(slow))));"
       );
   }
 

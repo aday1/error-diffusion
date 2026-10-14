@@ -463,18 +463,22 @@
     animation: none;
   }
 
+  /* Keep atmospheric layers; only freeze their CSS thrash. */
   .diffusion-mask,
-  .vhs-tear,
-  .noise,
-  .phosphor-fog,
-  #ediffGrain,
-  #glHost,
-  .diffusion-canvas {
+  .vhs-tear {
     animation: none !important;
   }
 
   .mosh-layer {
     display: none;
+  }
+
+  #glHost {
+    opacity: 0.55;
+  }
+
+  .diffusion-canvas {
+    opacity: 0.4;
   }
 }
 

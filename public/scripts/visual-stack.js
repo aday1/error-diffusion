@@ -47,6 +47,9 @@
     "  }",
     "  return v / 16.0;",
     "}",
+    "float hash21(vec2 p) {",
+    "  return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);",
+    "}",
     "vec3 hardMono(float t, int theme) {",
     "  float bands = step(0.22, t) + step(0.44, t) + step(0.66, t);",
     "  float g = bands / 3.0;",
@@ -54,14 +57,26 @@
     "  if (theme == 3) return vec3(g * 0.72, g * 0.76, g * 0.8);",
     "  return vec3(g);",
     "}",
+    "vec3 brandTint(float level, int theme) {",
+    "  vec3 base = hardMono(level, theme);",
+    "  vec3 acid = vec3(0.55, 1.0, 0.58);",
+    "  vec3 pink = vec3(1.0, 0.22, 0.35);",
+    "  if (theme == 1) return mix(base, mix(acid, pink, level), 0.55);",
+    "  if (theme == 2) return mix(base, vec3(1.0, 0.55, 0.22), level * 0.35);",
+    "  return mix(base, mix(acid * 0.55, pink * 0.35, step(0.62, level)), 0.42);",
+    "}",
     "void main(void) {",
     "  vec2 fMosaicScal = vec2(1.4, 2.0);",
     "  vec2 vScreenSize = vec2(resolution.x, resolution.y);",
     "  vec2 uv = gl_FragCoord.xy / resolution.xy;",
     "  vec2 m = mouse / resolution.xy;",
-    "  vec2 toMouse = uv - m;",
-    "  float mouseGlow = exp(-dot(toMouse, toMouse) * 14.0);",
-    "  vec3 u = normalize(vec3(2.0 * gl_FragCoord.xy - resolution.xy, resolution.xy.x)) * 0.9;",
+    "  float slow = time * 0.22;",
+    "  float tearGate = smoothstep(0.92, 0.995, hash21(vec2(floor(uv.y * 28.0), floor(slow))));",
+    "  float tearShift = (hash21(vec2(floor(uv.y * 18.0), floor(slow * 0.5))) - 0.5) * tearGate * 0.045;",
+    "  vec2 suv = uv + vec2(tearShift, 0.0);",
+    "  vec2 toMouse = suv - m;",
+    "  float mouseGlow = exp(-dot(toMouse, toMouse) * 12.0);",
+    "  vec3 u = normalize(vec3(2.0 * (suv * resolution.xy) - resolution.xy, resolution.xy.x)) * 0.9;",
     "  u.xy += (m - 0.5) * 0.35;",
     "  u.x = floor(u.x * vScreenSize.x / fMosaicScal.x) / (vScreenSize.x / fMosaicScal.x);",
     "  u.y = floor(u.y * vScreenSize.y / fMosaicScal.y) / (vScreenSize.y / fMosaicScal.y);",
@@ -75,15 +90,26 @@
     "    field = max(field, abs(cos(3.0 * dot(u, u))));",
     "    o = max(o, abs(cos(3.0 * dot(u, u) + vec4(0.0))));",
     "  }",
+    "  float wave = 0.5 + 0.28 * sin(suv.x * 18.0 - slow * 1.4) * exp(-fract(suv.x * 2.2 - slow * 0.15) * 5.0);",
+    "  float beam = 1.0 - smoothstep(0.01, 0.07, abs(suv.y - wave));",
+    "  float scan = mod(gl_FragCoord.y + slow * 18.0, 3.0) < 1.0 ? 0.78 : 1.0;",
+    "  float vignette = smoothstep(1.15, 0.25, length((suv - 0.5) * vec2(1.15, 1.0)));",
     "  if (uTheme == 1) {",
-    "    gl_FragColor = vec4(o.rgb, 1.0);",
+    "    vec3 rgb = o.rgb;",
+    "    rgb.r += tearGate * 0.18;",
+    "    rgb.b -= tearGate * 0.12;",
+    "    rgb = mix(rgb, vec3(0.55, 1.0, 0.58), beam * 0.22);",
+    "    gl_FragColor = vec4(rgb * scan * vignette, 1.0);",
     "    return;",
     "  }",
-    "  field = field * 0.68 + mouseGlow * 0.36;",
+    "  field = field * 0.68 + mouseGlow * 0.36 + beam * 0.18;",
     "  float dither = bayer4(gl_FragCoord.xy);",
     "  float level = field + (dither - 0.5) * 0.34;",
     "  level = clamp(level, 0.0, 1.0);",
-    "  vec3 col = hardMono(level, uTheme);",
+    "  vec3 col = brandTint(level, uTheme);",
+    "  col.r += tearGate * 0.12;",
+    "  col.g += beam * 0.08;",
+    "  col *= scan * vignette;",
     "  gl_FragColor = vec4(col, 1.0);",
     "}"
   ].join("\n");
@@ -110,7 +136,8 @@
   var coarsePointer = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
   var smallViewport = window.innerWidth < 700;
   var performanceMode = reducedMotion || coarsePointer || smallViewport;
-  var skipWebGL = performanceMode;
+  // Phones keep WebGL; only reduced-motion skips the field entirely.
+  var skipWebGL = reducedMotion;
 
   var state = {
     theme: "archive",
@@ -227,7 +254,7 @@
     var camera = new THREE.Camera();
     var scene = new THREE.Scene();
     var renderer = new THREE.WebGLRenderer({ antialias: false, alpha: false });
-    var dpr = Math.min(window.devicePixelRatio || 1, performanceMode ? 1 : 1.5);
+    var dpr = Math.min(window.devicePixelRatio || 1, (performanceMode || smallViewport || coarsePointer) ? 1 : 1.5);
     renderer.setPixelRatio(dpr);
 
     webgl.uniforms = {
@@ -563,7 +590,8 @@
   }
 
   function initMediaMosh() {
-    if (performanceMode || !global.EdiffMosh) return;
+    // Mosh stacks are the blinky path; keep them off for phones / reduced motion.
+    if (performanceMode || coarsePointer || !global.EdiffMosh) return;
     var stackEl = document.getElementById("mediaStack");
     if (!stackEl) return;
     var imgs = stackEl.querySelectorAll(".media-plane img");
