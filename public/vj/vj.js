@@ -6,6 +6,8 @@
   var sourceGrid = document.getElementById("sourceGrid");
   var sourceTemplate = document.getElementById("sourceTemplate");
   var fileInput = document.getElementById("fileInput");
+  var cameraSelect = document.getElementById("cameraSelect");
+  var inputNotice = document.getElementById("inputNotice");
   var engineStatus = document.getElementById("engineStatus");
   var stageError = document.getElementById("stageError");
   var busReadout = document.getElementById("busReadout");
@@ -18,6 +20,10 @@
   var resolutionSelect = document.getElementById("resolutionSelect");
   var blendSelect = document.getElementById("blendSelect");
   var helpDialog = document.getElementById("helpDialog");
+  var macroverseDialog = document.getElementById("macroverseDialog");
+  var macroverseForm = document.getElementById("macroverseForm");
+  var macroverseSession = document.getElementById("macroverseSession");
+  var macroverseStatus = document.getElementById("macroverseStatus");
 
   var SLOT_COUNT = 4;
   var STORAGE_KEY = "ediff-vj-state-v1";
@@ -100,6 +106,13 @@
     setStatus("engine: unavailable", "error");
   }
 
+  function showInputNotice(message, state) {
+    if (!inputNotice) return;
+    inputNotice.hidden = !message;
+    inputNotice.textContent = message || "";
+    inputNotice.dataset.state = state || "info";
+  }
+
   function hideError() {
     stageError.hidden = true;
     stageError.textContent = "";
@@ -167,6 +180,7 @@
         source: null,
         stream: null,
         objectUrl: "",
+        cleanup: null,
         kind: "empty",
         name: "open input",
         ready: false
@@ -206,6 +220,11 @@
   }
 
   function stopSource(slot) {
+    if (slot.cleanup) {
+      try {
+        slot.cleanup();
+      } catch (error) {}
+    }
     if (slot.source && slot.source.tagName === "VIDEO") {
       try {
         slot.source.pause();
@@ -224,6 +243,7 @@
     slot.source = null;
     slot.stream = null;
     slot.objectUrl = "";
+    slot.cleanup = null;
     slot.kind = "empty";
     slot.name = "open input";
     slot.ready = false;
@@ -248,6 +268,7 @@
     slot.name = options.name;
     slot.stream = options.stream || null;
     slot.objectUrl = options.objectUrl || "";
+    slot.cleanup = options.cleanup || null;
     slot.ready = true;
     slot.nameElement.textContent = shortName(options.name, 30);
     slot.metaElement.textContent = options.meta || options.kind;
@@ -335,35 +356,106 @@
     return busA;
   }
 
+  function cameraErrorMessage(error) {
+    var name = error && error.name ? error.name : "CameraError";
+    if (name === "NotAllowedError" || name === "SecurityError") {
+      return "Camera permission was blocked. Allow camera access for errordiffusion.net in the browser site controls, then try again.";
+    }
+    if (name === "NotFoundError" || name === "DevicesNotFoundError") {
+      return "No camera was found. Connect one, or choose another device from the camera menu.";
+    }
+    if (name === "NotReadableError" || name === "TrackStartError") {
+      return "The camera is busy or could not start. Close other camera apps and try again.";
+    }
+    if (name === "OverconstrainedError" || name === "ConstraintNotSatisfiedError") {
+      return "That camera could not supply the requested mode. Choose default camera and try again.";
+    }
+    return "Camera failed: " + name + (error && error.message ? " / " + error.message : "");
+  }
+
+  function refreshCameraDevices() {
+    if (!cameraSelect || !navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+      return Promise.resolve([]);
+    }
+    var selected = cameraSelect.value;
+    return navigator.mediaDevices.enumerateDevices().then(function (devices) {
+      var cameras = devices.filter(function (device) { return device.kind === "videoinput"; });
+      cameraSelect.innerHTML = "";
+      var defaultOption = document.createElement("option");
+      defaultOption.value = "";
+      defaultOption.textContent = cameras.length ? "default camera" : "no camera detected";
+      cameraSelect.appendChild(defaultOption);
+      cameras.forEach(function (device, index) {
+        var option = document.createElement("option");
+        option.value = device.deviceId;
+        option.textContent = device.label || "camera " + (index + 1);
+        cameraSelect.appendChild(option);
+      });
+      if (selected && cameras.some(function (device) { return device.deviceId === selected; })) {
+        cameraSelect.value = selected;
+      }
+      return cameras;
+    }).catch(function () {
+      return [];
+    });
+  }
+
   function addCamera() {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      showError("Camera input is unavailable in this browser. Camera access requires HTTPS or localhost.");
+      showInputNotice("Camera input is unavailable. It requires a current browser over HTTPS.", "error");
+      return;
+    }
+    if (!window.isSecureContext) {
+      showInputNotice("Camera access is blocked because this page is not in a secure browser context.", "error");
       return;
     }
     var index = firstOpenSlot();
+    var deviceId = cameraSelect ? cameraSelect.value : "";
+    var selectedLabel = cameraSelect && cameraSelect.selectedOptions.length
+      ? cameraSelect.selectedOptions[0].textContent
+      : "camera " + (index + 1);
+    var videoConstraints = deviceId
+      ? { deviceId: { exact: deviceId }, width: { ideal: 1280 }, height: { ideal: 720 } }
+      : { width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 30 } };
     setStatus("engine: requesting camera", "idle");
+    showInputNotice("Waiting for browser camera permission...", "info");
     navigator.mediaDevices.getUserMedia({
-      video: { width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 30, max: 60 } },
+      video: videoConstraints,
       audio: false
     }).then(function (stream) {
       var video = document.createElement("video");
-      video.srcObject = stream;
       video.muted = true;
       video.autoplay = true;
       video.playsInline = true;
       video.addEventListener("loadedmetadata", function () {
-        setSlotSource(index, video, {
-          kind: "camera",
-          name: "camera " + (index + 1),
-          stream: stream,
-          meta: video.videoWidth + "x" + video.videoHeight + " / live"
-        });
-        video.play();
+        if (!slots[index] || slots[index].stream !== stream) return;
+        slots[index].metaElement.textContent = video.videoWidth + "x" + video.videoHeight + " / live";
         setStatus("engine: live", "live");
+        showInputNotice(selectedLabel + " is live in slot " + (index + 1) + ".", "ok");
       }, { once: true });
+      video.srcObject = stream;
+      setSlotSource(index, video, {
+        kind: "camera",
+        name: selectedLabel || "camera " + (index + 1),
+        stream: stream,
+        meta: "starting camera..."
+      });
+      var track = stream.getVideoTracks()[0];
+      if (track) {
+        track.addEventListener("ended", function () {
+          if (slots[index] && slots[index].stream === stream) {
+            clearSlot(index);
+            showInputNotice("Camera stopped.", "info");
+          }
+        }, { once: true });
+      }
+      video.play().catch(function () {
+        slots[index].metaElement.textContent = "click output to start";
+      });
+      refreshCameraDevices();
     }).catch(function (error) {
       setStatus("engine: camera denied", "error");
-      recordReadout.textContent = error && error.name ? error.name : "camera denied";
+      showInputNotice(cameraErrorMessage(error), "error");
     });
   }
 
@@ -374,25 +466,31 @@
     }
     var index = firstOpenSlot();
     setStatus("engine: requesting screen", "idle");
+    showInputNotice("Choose a screen, window, or browser tab to use as a source.", "info");
     navigator.mediaDevices.getDisplayMedia({
       video: { frameRate: { ideal: 30, max: 60 } },
       audio: false
     }).then(function (stream) {
       var video = document.createElement("video");
-      video.srcObject = stream;
       video.muted = true;
       video.autoplay = true;
       video.playsInline = true;
       video.addEventListener("loadedmetadata", function () {
-        setSlotSource(index, video, {
-          kind: "screen",
-          name: "screen " + (index + 1),
-          stream: stream,
-          meta: video.videoWidth + "x" + video.videoHeight + " / live"
-        });
-        video.play();
+        if (!slots[index] || slots[index].stream !== stream) return;
+        slots[index].metaElement.textContent = video.videoWidth + "x" + video.videoHeight + " / live";
         setStatus("engine: live", "live");
+        showInputNotice("Screen capture is live in slot " + (index + 1) + ".", "ok");
       }, { once: true });
+      video.srcObject = stream;
+      setSlotSource(index, video, {
+        kind: "screen",
+        name: "screen " + (index + 1),
+        stream: stream,
+        meta: "starting screen..."
+      });
+      video.play().catch(function () {
+        slots[index].metaElement.textContent = "click output to start";
+      });
       var track = stream.getVideoTracks()[0];
       if (track) {
         track.addEventListener("ended", function () {
@@ -401,7 +499,65 @@
       }
     }).catch(function (error) {
       setStatus("engine: screen cancelled", "idle");
-      recordReadout.textContent = error && error.name ? error.name : "screen cancelled";
+      showInputNotice("Screen capture did not start: " + (error && error.name ? error.name : "cancelled"), "error");
+    });
+  }
+
+  function openMacroverseDialog() {
+    try {
+      var saved = localStorage.getItem("ediff-macroverse-session");
+      if (saved) macroverseSession.value = saved;
+    } catch (error) {}
+    macroverseStatus.textContent = "Uses Macroverse's viewer-only live output. Open its VJ deck and load a shader into A or B.";
+    if (macroverseDialog.showModal) macroverseDialog.showModal();
+    else macroverseDialog.setAttribute("open", "");
+  }
+
+  function addMacroverse(sessionId) {
+    if (!window.MacroverseInput || typeof window.MacroverseInput.createSource !== "function") {
+      showInputNotice("Macroverse input module did not load. Reload the page and try again.", "error");
+      return;
+    }
+    var session = String(sessionId || "default").trim().slice(0, 64) || "default";
+    var index = firstOpenSlot();
+    var handle;
+    function updateMacroverseStatus(state, message) {
+      macroverseStatus.textContent = message;
+      if (slots[index] && slots[index].source === (handle && handle.canvas)) {
+        slots[index].metaElement.textContent = state === "signal" ? "640x360 / live session" : message;
+      }
+      if (state === "error") {
+        showInputNotice(message, "error");
+      } else if (state === "signal") {
+        showInputNotice("Macroverse session " + session + " is live in slot " + (index + 1) + ".", "ok");
+      }
+    }
+    try {
+      handle = window.MacroverseInput.createSource({
+        sessionId: session,
+        onStatus: updateMacroverseStatus
+      });
+    } catch (error) {
+      showInputNotice("Macroverse input failed: " + (error.message || "WebGL unavailable"), "error");
+      return;
+    }
+    setSlotSource(index, handle.canvas, {
+      kind: "macroverse",
+      name: "macroverse " + session,
+      meta: "connecting to live session...",
+      cleanup: handle.close
+    });
+    busA = index;
+    updateBusUi();
+    setStatus("engine: macroverse link", "live");
+    showInputNotice("Connecting Macroverse session " + session + "...", "info");
+    try {
+      localStorage.setItem("ediff-macroverse-session", session);
+    } catch (error) {}
+    handle.ready.then(function () {
+      if (macroverseDialog.open) macroverseDialog.close();
+    }).catch(function () {
+      if (slots[index] && slots[index].source === handle.canvas) clearSlot(index);
     });
   }
 
@@ -948,6 +1104,7 @@
       fileInput.click();
     });
     document.getElementById("addCameraButton").addEventListener("click", addCamera);
+    document.getElementById("addMacroverseButton").addEventListener("click", openMacroverseDialog);
     document.getElementById("addScreenButton").addEventListener("click", addScreen);
     document.getElementById("clearButton").addEventListener("click", function () {
       engine.clear();
@@ -1002,6 +1159,21 @@
     helpDialog.addEventListener("click", function (event) {
       if (event.target === helpDialog) helpDialog.close();
     });
+    document.getElementById("closeMacroverseButton").addEventListener("click", function () {
+      macroverseDialog.close();
+    });
+    macroverseDialog.addEventListener("click", function (event) {
+      if (event.target === macroverseDialog) macroverseDialog.close();
+    });
+    macroverseForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+      addMacroverse(macroverseSession.value);
+    });
+
+    refreshCameraDevices();
+    if (navigator.mediaDevices && navigator.mediaDevices.addEventListener) {
+      navigator.mediaDevices.addEventListener("devicechange", refreshCameraDevices);
+    }
 
     window.addEventListener("dragenter", function (event) {
       event.preventDefault();
@@ -1078,6 +1250,11 @@
       engine.start();
       setStatus("engine: live", "live");
       recordReadout.textContent = "output clear";
+      var linkedSession = new URLSearchParams(window.location.search).get("macroverseSession");
+      if (linkedSession && linkedSession.trim()) {
+        macroverseSession.value = linkedSession.trim().slice(0, 64);
+        addMacroverse(macroverseSession.value);
+      }
     } catch (error) {
       showError(error && error.message ? error.message : "The VJ engine could not start.");
     }

@@ -214,6 +214,12 @@ button:disabled {
   animation: record-pulse 1s steps(2, end) infinite;
 }
 
+.button-macroverse {
+  border-color: rgba(238, 136, 51, 0.62);
+  color: #ffd0a8;
+  background: rgba(54, 25, 8, 0.72);
+}
+
 .button-panic {
   border-color: rgba(240, 95, 59, 0.45);
   color: #ffc3b4;
@@ -353,6 +359,29 @@ body.dragging .drop-target {
   justify-content: space-between;
   flex-wrap: wrap;
   padding: 0.45rem;
+}
+
+.input-notice {
+  flex: 1 0 100%;
+  margin: 0;
+  padding: 0.45rem 0.55rem;
+  border-left: 3px solid var(--amber);
+  color: #f4d9a0;
+  background: rgba(65, 42, 8, 0.45);
+  font-size: 0.62rem;
+  line-height: 1.45;
+}
+
+.input-notice[data-state="error"] {
+  border-color: var(--red);
+  color: #ffc6b8;
+  background: rgba(72, 15, 5, 0.52);
+}
+
+.input-notice[data-state="ok"] {
+  border-color: var(--lime);
+  color: #e7ff9a;
+  background: rgba(40, 55, 5, 0.48);
 }
 
 .source-panel,
@@ -772,6 +801,39 @@ dialog > p {
   line-height: 1.55;
 }
 
+.macroverse-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.55rem;
+  align-items: end;
+}
+
+.macroverse-form label {
+  display: grid;
+  gap: 0.35rem;
+  color: var(--muted);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+}
+
+.macroverse-form input {
+  width: 100%;
+  min-height: 36px;
+  border: 1px solid rgba(238, 136, 51, 0.45);
+  border-radius: 0;
+  padding: 0.45rem 0.55rem;
+  color: #fff1df;
+  background: #120b07;
+}
+
+.macroverse-link {
+  display: inline-block;
+  margin-top: 0.7rem;
+  color: #ffb677;
+  font-size: 0.68rem;
+  text-underline-offset: 3px;
+}
+
 .stage-shell:fullscreen {
   width: 100vw;
   height: 100vh;
@@ -867,12 +929,17 @@ dialog > p {
   }
 
   .transport-group:first-child {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .transport .button {
     min-width: 0;
     padding-inline: 0.3rem;
+  }
+
+  .camera-select {
+    max-width: none;
+    grid-column: 1 / -1;
   }
 
   .panel-head {
@@ -895,6 +962,10 @@ dialog > p {
 
   .key-grid {
     grid-template-columns: 6.2rem 1fr;
+  }
+
+  .macroverse-form {
+    grid-template-columns: 1fr;
   }
 }
 
