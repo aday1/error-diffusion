@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#050705">
+  <title>frame residue // error diffusion VJ</title>
+  <meta name="description" content="A live, multi-input frame-feedback and datamosh-inspired VJ instrument for the browser.">
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Newsreader:ital,opsz,wght@0,6..72,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="vj.css?v=20261018-a">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="../" aria-label="Back to Error Diffusion">
+      <span class="brand-mark" aria-hidden="true">ED</span>
+      <span><strong>frame residue</strong><small>browser VJ instrument</small></span>
+    </a>
+    <div class="top-actions">
+      <span class="status" id="engineStatus" data-state="idle">engine: waiting</span>
+      <button type="button" class="button button-quiet" id="helpButton" aria-haspopup="dialog">keys</button>
+      <button type="button" class="button" id="fullscreenButton">fullscreen</button>
+      <button type="button" class="button button-record" id="recordButton">record</button>
+    </div>
+  </header>
+
+  <main class="rig">
+    <section class="stage-column" aria-label="VJ output">
+      <div class="stage-shell" id="stageShell">
+        <canvas id="outputCanvas" width="1280" height="720" aria-label="Live processed video output"></canvas>
+        <div class="drop-target" id="dropTarget">
+          <strong>drop video, image, or several files</strong>
+          <span>files stay in this browser</span>
+        </div>
+        <div class="stage-osd stage-osd-top">
+          <span id="busReadout">A: INTERNAL / B: INTERNAL</span>
+          <span id="frameReadout">1280x720 / 0 fps</span>
+        </div>
+        <div class="stage-osd stage-osd-bottom">
+          <span id="presetReadout">RESIDUE</span>
+          <span id="recordReadout">output clear</span>
+        </div>
+        <div class="stage-error" id="stageError" role="alert" hidden></div>
+      </div>
+
+      <div class="transport panel">
+        <div class="transport-group">
+          <button type="button" class="button button-hot" id="addFilesButton">add files</button>
+          <button type="button" class="button" id="addCameraButton">add camera</button>
+          <button type="button" class="button" id="addScreenButton">share screen</button>
+          <input id="fileInput" type="file" accept="video/*,image/*" multiple hidden>
+        </div>
+        <div class="transport-group">
+          <button type="button" class="button" id="freezeButton" aria-pressed="false">freeze</button>
+          <button type="button" class="button" id="clearButton">clear memory</button>
+          <button type="button" class="button" id="randomButton">mutate</button>
+          <button type="button" class="button button-panic" id="panicButton">clean signal</button>
+        </div>
+      </div>
+
+      <section class="panel source-panel" aria-labelledby="sourceHeading">
+        <div class="panel-head">
+          <div>
+            <span class="eyebrow">input matrix</span>
+            <h1 id="sourceHeading">four sources / two live buses</h1>
+          </div>
+          <p>Load files, camera, or a screen. Route any slot to A or B, then crossfade.</p>
+        </div>
+        <div class="source-grid" id="sourceGrid"></div>
+        <p class="privacy-note">Local media never uploads. Camera and screen access use browser permission and stop when a slot is cleared.</p>
+      </section>
+    </section>
+
+    <aside class="controls-column" aria-label="Effect controls">
+      <section class="panel preset-panel">
+        <div class="panel-head compact">
+          <div>
+            <span class="eyebrow">state bank</span>
+            <h2>damage presets</h2>
+          </div>
+          <select id="resolutionSelect" aria-label="Render resolution">
+            <option value="854x480">480p</option>
+            <option value="1280x720" selected>720p</option>
+            <option value="1920x1080">1080p</option>
+          </select>
+        </div>
+        <div class="preset-grid" id="presetGrid">
+          <button type="button" data-preset="residue" class="preset active"><strong>residue</strong><span>soft held frames</span></button>
+          <button type="button" data-preset="macro"><strong>macro rot</strong><span>blocked motion trails</span></button>
+          <button type="button" data-preset="melt"><strong>long melt</strong><span>vertical drag</span></button>
+          <button type="button" data-preset="split"><strong>split nerve</strong><span>RGB displacement</span></button>
+          <button type="button" data-preset="packet"><strong>packet grave</strong><span>frozen block loss</span></button>
+          <button type="button" data-preset="clean"><strong>clean signal</strong><span>feedback bypass</span></button>
+        </div>
+      </section>
+
+      <section class="panel control-panel">
+        <div class="panel-head compact">
+          <div>
+            <span class="eyebrow">frame memory</span>
+            <h2>motion residue</h2>
+          </div>
+          <output id="memorySummary">84%</output>
+        </div>
+        <label class="control">
+          <span><strong>hold</strong><output data-output="feedback">0.84</output></span>
+          <input data-param="feedback" type="range" min="0" max="0.985" step="0.001" value="0.84">
+        </label>
+        <label class="control">
+          <span><strong>motion pull</strong><output data-output="motion">0.58</output></span>
+          <input data-param="motion" type="range" min="0" max="1" step="0.01" value="0.58">
+        </label>
+        <label class="control">
+          <span><strong>smear</strong><output data-output="smear">0.46</output></span>
+          <input data-param="smear" type="range" min="0" max="1" step="0.01" value="0.46">
+        </label>
+        <label class="control">
+          <span><strong>block memory</strong><output data-output="blocks">0.54</output></span>
+          <input data-param="blocks" type="range" min="0" max="1" step="0.01" value="0.54">
+        </label>
+        <label class="control">
+          <span><strong>packet loss</strong><output data-output="dropout">0.12</output></span>
+          <input data-param="dropout" type="range" min="0" max="1" step="0.01" value="0.12">
+        </label>
+      </section>
+
+      <section class="panel control-panel">
+        <div class="panel-head compact">
+          <div>
+            <span class="eyebrow">source braid</span>
+            <h2>A / B mixer</h2>
+          </div>
+          <select id="blendSelect" aria-label="Source blend mode">
+            <option value="0">crossfade</option>
+            <option value="1">difference</option>
+            <option value="2">lighten</option>
+            <option value="3">hard cut</option>
+            <option value="4">multiply</option>
+          </select>
+        </div>
+        <label class="control crossfader">
+          <span><strong>crossfade</strong><output data-output="mix">A 50 / B 50</output></span>
+          <input data-param="mix" type="range" min="0" max="1" step="0.01" value="0.5">
+          <span class="range-ends"><i>A</i><i>B</i></span>
+        </label>
+        <label class="control">
+          <span><strong>RGB drift</strong><output data-output="chroma">0.34</output></span>
+          <input data-param="chroma" type="range" min="0" max="1" step="0.01" value="0.34">
+        </label>
+        <label class="control">
+          <span><strong>vertical melt</strong><output data-output="melt">0.22</output></span>
+          <input data-param="melt" type="range" min="0" max="1" step="0.01" value="0.22">
+        </label>
+        <label class="control">
+          <span><strong>grain</strong><output data-output="noise">0.08</output></span>
+          <input data-param="noise" type="range" min="0" max="1" step="0.01" value="0.08">
+        </label>
+        <label class="control">
+          <span><strong>contrast</strong><output data-output="contrast">1.12</output></span>
+          <input data-param="contrast" type="range" min="0.7" max="2" step="0.01" value="1.12">
+        </label>
+      </section>
+
+      <section class="panel notes-panel">
+        <span class="eyebrow">what this is</span>
+        <h2>not broken MPEG</h2>
+        <p>True datamoshing damages codec prediction frames. This live instrument recreates its visual logic with GPU frame feedback, block-held history, motion displacement, and source substitution.</p>
+        <dl>
+          <div><dt>1-4</dt><dd>route slot to A</dd></div>
+          <div><dt>Q-R</dt><dd>route slot to B</dd></div>
+          <div><dt>space</dt><dd>freeze / release</dd></div>
+          <div><dt>C / M</dt><dd>clear / mutate</dd></div>
+          <div><dt>F / Shift+R</dt><dd>fullscreen / record</dd></div>
+        </dl>
+      </section>
+    </aside>
+  </main>
+
+  <dialog id="helpDialog">
+    <div class="dialog-head">
+      <div>
+        <span class="eyebrow">performance map</span>
+        <h2>keyboard controls</h2>
+      </div>
+      <button type="button" class="button" id="closeHelpButton">close</button>
+    </div>
+    <div class="key-grid">
+      <kbd>1 2 3 4</kbd><span>send source slot to bus A</span>
+      <kbd>Q W E R</kbd><span>send source slot to bus B</span>
+      <kbd>Space</kbd><span>freeze or release the feedback frame</span>
+      <kbd>C</kbd><span>clear all retained frames</span>
+      <kbd>M</kbd><span>mutate the effect controls</span>
+      <kbd>F</kbd><span>fullscreen the output</span>
+      <kbd>Shift + R</kbd><span>start or stop a WebM recording</span>
+      <kbd>Esc</kbd><span>leave fullscreen or close this panel</span>
+    </div>
+    <p>Tip: hard cuts between unrelated moving clips, high hold, and medium block memory create the strongest mosh-like transitions.</p>
+  </dialog>
+
+  <template id="sourceTemplate">
+    <article class="source-card" data-slot="">
+      <div class="source-preview">
+        <canvas width="320" height="180" aria-hidden="true"></canvas>
+        <span class="slot-number"></span>
+        <span class="source-type">empty</span>
+      </div>
+      <div class="source-info">
+        <strong class="source-name">open input</strong>
+        <span class="source-meta">drop media here</span>
+      </div>
+      <div class="source-route">
+        <button type="button" class="route route-a" aria-pressed="false">A</button>
+        <button type="button" class="route route-b" aria-pressed="false">B</button>
+        <button type="button" class="slot-clear" aria-label="Clear source">clear</button>
+      </div>
+    </article>
+  </template>
+
+  <script src="vj.js?v=20261018-a"></script>
+</body>
+</html>
